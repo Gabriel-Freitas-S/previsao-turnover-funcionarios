@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Ambiente (scipy-notebook)
+.jupyter/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Slides (gerados pelos scripts)
+slides/apresentacao_turnover.pdf

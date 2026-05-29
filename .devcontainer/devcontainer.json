@@ -1,0 +1,16 @@
+{
+  "name": "Previsao Turnover - ML Project",
+  "image": "docker.io/jupyter/scipy-notebook",
+  "containerUser": "jovyan",
+  "workspaceFolder": "/workspaces/previsao-turnover-funcionarios",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  },
+  "postCreateCommand": "pip install --quiet -r requirements.txt",
+  "appPort": ["8888:8888"]
+}

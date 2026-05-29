@@ -1,0 +1,19 @@
+# Projeto: Previsao de Rotatividade de Funcionarios
+# Machine Learning - Classificacao Binaria (Turnover)
+# Instalar com: pip install -r requirements.txt
+
+# === Machine Learning e processamento de dados ===
+scikit-learn
+pandas
+numpy
+
+# === Visualizacao ===
+matplotlib
+seaborn
+
+# === Documentos e apresentacao ===
+fpdf2
+
+# === Jupyter (opcional, ja incluso na imagem scipy-notebook) ===
+notebook
+jupyter
