@@ -5,6 +5,7 @@ Classificação Binária para Turnover Corporativo usando Machine Learning.
 [![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4-orange)](https://scikit-learn.org)
 [![Status](https://img.shields.io/badge/Status-Concluído-green)]()
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gabriel-Freitas-S/previsao-turnover-funcionarios/blob/main/notebooks/previsao_turnover.ipynb)
 
 ## Problema
 
