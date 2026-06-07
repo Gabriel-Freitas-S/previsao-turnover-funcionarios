@@ -357,11 +357,11 @@
     display: flex;
   }
 
-  /* Top Bar */
+  /* Top Bar (Hidden in Pure Fullscreen) */
   .pres-top-bar {
     width: 100%;
-    max-width: 1100px;
-    display: flex;
+    max-width: 90%;
+    display: none !important;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -413,12 +413,22 @@
   /* Slide Area */
   .pres-slide-container {
     width: 100%;
-    max-width: 1100px;
-    height: 72vh;
+    max-width: 90%;
+    height: 90vh;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    padding: 1.5rem 0;
+  }
+  .pres-hint {
+    position: absolute;
+    bottom: 1rem;
+    right: 1.5rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+    z-index: 10000;
   }
   .pres-slide {
     display: none;
@@ -526,11 +536,11 @@
     margin-top: 1rem;
   }
 
-  /* Bottom Navigation Bar */
+  /* Bottom Navigation Bar (Hidden in Pure Fullscreen) */
   .pres-bottom-bar {
     width: 100%;
-    max-width: 1100px;
-    display: flex;
+    max-width: 90%;
+    display: none !important;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid rgba(255,255,255,0.1);
@@ -902,20 +912,14 @@
     </div>
   </section>
 
-  <!-- 9. Conclusão e Melhorias -->
+  <!-- 9. Conclusão -->
   <section id="conclusao">
-    <h2 class="section-title"><span class="num">9</span> Conclusões e Trabalhos Futuros</h2>
+    <h2 class="section-title"><span class="num">9</span> Conclusão</h2>
     <div class="card">
-      <h3>Conclusões</h3>
+      <h3>Conclusão</h3>
       <ul>
         <li>O pipeline de Machine Learning obteve sucesso na identificação de colaboradores propensos ao atrito, com o modelo de Regressão Logística atingindo sensibilidade de <strong>72,34%</strong> (Recall).</li>
         <li>A análise de coeficientes e importância de atributos confirmou que a prestação de horas extras (OverTime), baixos níveis salariais e o início de carreira na organização são os fatores mais correlacionados com a insatisfação e saída dos colaboradores.</li>
-      </ul>
-      <h3 style="margin-top: 1.5rem;">Trabalhos Futuros e Melhorias</h3>
-      <ul>
-        <li><strong>SMOTE (Synthetic Minority Over-sampling Technique):</strong> Testar a geração de amostras sintéticas da classe minoritária para comparar com o ajuste de pesos lineares.</li>
-        <li><strong>Redes Neurais / Modelos Avançados:</strong> Implementar arquiteturas MLP (Multi-Layer Perceptron) ou algoritmos como XGBoost e LightGBM.</li>
-        <li><strong>Pesquisa de Clima Ativa:</strong> Incorporar dados temporais e de engajamento atualizados para predições dinâmicas mês a mês.</li>
       </ul>
     </div>
   </section>
@@ -1117,15 +1121,14 @@
       </div>
     </div>
 
-    <!-- Slide 10: Conclusão e Melhorias -->
+    <!-- Slide 10: Conclusão -->
     <div class="pres-slide">
-      <h2>9. Conclusão e Próximos Passos</h2>
+      <h2>9. Conclusão</h2>
       <ul>
         <li>O modelo de Regressão Logística provou ser viável para antecipar evasões de talentos, permitindo ações proativas do RH (Recall = 72,34% no teste).</li>
         <li>Horas extras elevadas e remuneração mensal inferior destacam-se como os maiores alavancadores do desgaste corporativo.</li>
-        <li><strong>Melhorias Planejadas:</strong> Testar balanceamento via sobreamostragem SMOTE, implementar modelos baseados em Boosting (XGBoost, LightGBM) e desenvolver um dashboard interativo (Streamlit) para as predições.</li>
       </ul>
-      <div class="highlight-box" style="margin-top: 1rem; text-align: center;">
+      <div class="highlight-box" style="margin-top: 1.5rem; text-align: center;">
         <strong>Links do Repositório GitHub e Colab:</strong><br>
         <span style="font-family: monospace; font-size: 0.95rem; color: #60a5fa;">https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios</span>
       </div>
@@ -1139,6 +1142,9 @@
     <div style="font-size: 0.85rem; color: #94a3b8;">Atalhos: Setas Laterais e Esc (Sair)</div>
     <button class="btn-nav-pres" id="pres-btn-next" onclick="nextSlide()">Próximo →</button>
   </div>
+
+  <!-- Dica de Navegação Pequena e Discreta na Lateral Direita -->
+  <div class="pres-hint">Dica: Use as setas (← / →) ou clique nas laterais para navegar. Pressione ESC para sair.</div>
 </div>
 
 <script>
@@ -1150,19 +1156,52 @@
   const btnPrev = document.getElementById('pres-btn-prev');
   const btnNext = document.getElementById('pres-btn-next');
 
-  // Abre o modo de apresentação
+  // Abre o modo de apresentação com Tela Cheia
   function openPresentation() {
-    document.getElementById('presentation-overlay').classList.add('active');
+    const overlay = document.getElementById('presentation-overlay');
+    overlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // Impede scroll do fundo
     currentSlide = 0;
     showSlide(currentSlide);
+
+    // Solicita tela cheia se suportado pelo navegador
+    if (overlay.requestFullscreen) {
+      overlay.requestFullscreen().catch(err => {
+        console.log("Erro ao entrar em tela cheia:", err);
+      });
+    } else if (overlay.mozRequestFullScreen) { /* Firefox */
+      overlay.mozRequestFullScreen();
+    } else if (overlay.webkitRequestFullscreen) { /* Chrome/Safari */
+      overlay.webkitRequestFullscreen();
+    } else if (overlay.msRequestFullscreen) { /* IE/Edge */
+      overlay.msRequestFullscreen();
+    }
   }
 
-  // Fecha o modo de apresentação
+  // Fecha o modo de apresentação e sai da Tela Cheia
   function closePresentation() {
-    document.getElementById('presentation-overlay').classList.remove('active');
+    const overlay = document.getElementById('presentation-overlay');
+    overlay.classList.remove('active');
     document.body.style.overflow = ''; // Restaura scroll do fundo
+
+    // Sai da tela cheia se estiver ativa
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(err => {
+        console.log("Erro ao sair de tela cheia:", err);
+      });
+    }
   }
+
+  // Sincroniza se o usuário fechar a tela cheia nativamente (ex: pressionando F11 ou Esc nativo)
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) {
+      const overlay = document.getElementById('presentation-overlay');
+      if (overlay.classList.contains('active')) {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+  });
 
   // Exibe um slide específico
   function showSlide(index) {
@@ -1211,6 +1250,25 @@
       } else if (event.key === 'Escape') {
         closePresentation();
       }
+    }
+  });
+
+  // Event Listener para cliques de navegação (toque nas laterais da tela)
+  const presentationOverlay = document.getElementById('presentation-overlay');
+  presentationOverlay.addEventListener('click', function(event) {
+    // Se o clique foi dentro do slide (conteúdo), ignora
+    if (event.target.closest('.pres-slide')) {
+      return;
+    }
+    
+    // Divide a tela no meio
+    const clickX = event.clientX;
+    const windowWidth = window.innerWidth;
+    
+    if (clickX < windowWidth / 2) {
+      prevSlide();
+    } else {
+      nextSlide();
     }
   });
 </script>

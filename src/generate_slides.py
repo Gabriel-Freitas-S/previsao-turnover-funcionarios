@@ -176,20 +176,8 @@ class SlidePDF(FPDF):
 
 def build_presentation() -> None:
     """
-    Constroi a apresentacao completa de 10 slides chamando os metodos
-    apropriados da classe SlidePDF.
-
-    Estrutura dos slides:
-        1. Capa (titulo, subtitulo, disciplina, dataset)
-        2. Definicao do Problema (classificacao binaria, relevancia)
-        3. Obtencao e Preparacao dos Dados (dataset, pre-processamento)
-        4. Analise Exploratoria (distribuicao, insights, grafico EDA)
-        5. Metodologia (modelos, grids, validacao cruzada)
-        6. Resultados (melhores parametros, tabela comparativa)
-        7. Graficos de Desempenho (curva ROC, matrizes, importancias)
-        8. Discussao (analise dos resultados, importancia do F1-Score)
-        9. Conclusoes e Melhorias (resultados finais, proximos passos)
-        10. Referencias e Repositorio (fontes, link do GitHub)
+    Constroi a apresentacao de 10 slides em formato Paisagem A4,
+    alinhada de forma identica (1 para 1) com o Modo Apresentacao do index.html.
     """
     pdf = SlidePDF()
     pdf.alias_nb_pages()
@@ -197,123 +185,133 @@ def build_presentation() -> None:
     # =====================================================================
     # Slide 1 - Capa
     # =====================================================================
-    # Titulo principal com subtitulo descritivo e informacoes institucionais.
     pdf.add_title_slide(
-        "Previsao de Rotatividade de Funcionarios",
-        "Classificacao Binaria para Turnover Corporativo\nIBM HR Analytics Employee Attrition & Performance"
+        "Previsão de Rotatividade de Funcionários",
+        "Classificação Binária para Turnover de RH e Estudo de Caso Bike Sharing"
     )
-
-    # Slide 2 - Definicao do Problema
     # =====================================================================
-    # Explica o problema de classificacao binaria, as classes envolvidas
-    # e a relevancia pratica para o RH corporativo.
-    pdf.add_section_slide("1", "Definição do Problema")
+    # Slide 2 - 1. Introdução e Relevância do Problema
+    # =====================================================================
+    pdf.add_section_slide("1", "Introdução e Relevância do Problema")
     pdf.add_body_text(
-        "Problema: Prever se um funcionário tem alta probabilidade de deixar a empresa "
-        "(Turnover). Trata-se de um problema de Classificação Binária:\n\n"
-        "  - Classe Positiva (1): Funcionário saiu da empresa (Sim)\n"
-        "  - Classe Negativa (0): Funcionário permaneceu (Não)\n\n"
-        "Relevância: A saída repentina de funcionários que dominam fluxos documentais "
-        "críticos gera custos de recrutamento, perda de conhecimento institucional e "
-        "riscos à conformidade legal. A retenção preditiva de talentos é uma prioridade "
-        "estratégica para o RH."
+        "Problema: Predição de saída voluntária de colaboradores (Turnover/Attrition) usando aprendizado de máquina supervisionado."
     )
+    pdf.ln(3)
+    
+    # Desenho da Caixa de Destaque (Estilo Highlight Box)
+    pdf.set_fill_color(240, 246, 255)
+    pdf.set_draw_color(37, 99, 235)
+    pdf.set_line_width(0.4)
+    current_y = pdf.get_y()
+    pdf.rect(10, current_y, 277, 24, style="FD")
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_text_color(37, 99, 235)
+    pdf.text(13, current_y + 6, "Valor de Negócio (Retenção Estratégica e Fluxos Documentais):")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(40, 40, 40)
+    pdf.set_xy(13, current_y + 8)
+    pdf.multi_cell(271, 5, "A evasão repentina de funcionários em posições-chave interrompe fluxos operacionais críticos e de faturamento. A predição atua mitigando custos de rescisão, recrutamento e perda do conhecimento institucional.")
+    
+    pdf.set_xy(10, current_y + 28)
+    pdf.add_bullet("Tipo de Problema: Classificação Binária (Classe 1 = Saiu, Classe 0 = Permaneceu)")
+    pdf.add_bullet("Desafio Principal: Lidar com o forte desbalanceamento nativo dos dados de RH (apenas ~16% de casos de saída).")
 
-    # Slide 3 - Obtencao e Preparacao dos Dados
+    # =====================================================================
+    # Slide 3 - 2. Obtenção e Preparação dos Dados
     # =====================================================================
     pdf.add_section_slide("2", "Obtenção e Preparação dos Dados")
-    pdf.add_body_text("Dataset: IBM HR Analytics Employee Attrition & Performance (Kaggle)")
-    pdf.add_bullet("1470 registros, 35 atributos (23 numéricos, 7 categóricos restantes)")
-    pdf.add_bullet("0 valores nulos - dados previamente higienizados e completos")
-    pdf.add_bullet("Variável alvo: Turnover (Sim/Não)")
-    pdf.ln(5)
-    pdf.add_body_text("Pré-processamento:")
-    pdf.add_bullet("Remoção de colunas sem variância: ContagemFuncionarios, HorasPadrao, MaiorDe18")
-    pdf.add_bullet("Remoção do identificador: NumeroFuncionario")
-    pdf.add_bullet("Codificação One-Hot para variáveis categóricas (7 features)")
-    pdf.add_bullet("Padronização (StandardScaler) para variáveis numéricas")
-    pdf.add_bullet("ColumnTransformer + Pipeline para evitar vazamento de dados (data leakage)")
-    pdf.add_bullet("Divisão: 60% treino / 20% validação / 20% teste (estratificada)")
+    pdf.add_body_text("Dataset: IBM HR Analytics Employee Attrition & Performance (1470 registros, 35 colunas).")
+    pdf.ln(2)
+    pdf.add_bullet("Limpeza Crítica: Remoção de atributos sem variância (StandardHours, EmployeeCount, Over18) e crachá (EmployeeNumber).")
+    pdf.add_bullet("Transformação de Atributos: Codificação One-Hot para variáveis categóricas qualitativas e Normalização (StandardScaler) para variáveis contínuas salariais e de tempo.")
+    pdf.add_bullet("Blindagem contra Vazamento (Data Leakage): Uso de ColumnTransformer e Pipeline ajustados estritamente na base de treino.")
+    pdf.add_bullet("Particionamento (SPEC): Divisão estratificada em 60% Treino (882), 20% Validação (294) e 20% Teste (294).")
 
     # =====================================================================
-    # Slide 4 - Analise Exploratoria dos Dados (EDA)
+    # Slide 4 - 3. Análise Exploratória de Dados (EDA)
     # =====================================================================
-    pdf.add_section_slide("3", "Análise Exploratória dos Dados (EDA)")
-    pdf.add_body_text("Distribuição da variável alvo - Desbalanceamento:")
-    pdf.add_bullet("83,88% dos funcionários permanecem na empresa (Não)")
-    pdf.add_bullet("16,12% dos funcionários saíram (Sim)")
-    pdf.add_bullet("237 casos positivos vs 1233 casos negativos")
-    pdf.ln(3)
-    pdf.add_body_text("Principais insights da EDA:")
-    pdf.add_bullet("Funcionários mais jovens apresentam maior propensão à saída")
-    pdf.add_bullet("Renda mensal mais baixa correlaciona fortemente com maior turnover")
-    pdf.add_bullet("Horas extras (HoraExtra) aumentam significativamente o risco")
-    pdf.add_bullet("Departamento de Vendas (Sales) tem maior taxa proporcional de turnover")
-    pdf.add_bullet("Cargos como Representante de Vendas e Técnico de Laboratório têm maior rotatividade")
-    pdf.ln(3)
-    pdf.add_image_centered(os.path.join(SLIDES_DIR, "eda_plots.png"), w=140)
+    pdf.add_section_slide("3", "Análise Exploratória de Dados (EDA)")
+    pdf.add_body_text("Mapeamento das Relações Organizacionais:")
+    pdf.add_bullet("Forte desbalanceamento nativo: 83,88% Não / 16,12% Sim.")
+    pdf.add_bullet("Horas Extras acumulam-se como o maior causador de evasão voluntária por estresse (Burnout).")
+    pdf.add_bullet("Salários baixos e início de carreira (poucos anos de casa) impulsionam transições externas.")
+    pdf.add_bullet("Vendas é o departamento com maior desgaste relativo.")
+    pdf.ln(2)
+    pdf.add_image_centered(os.path.join(SLIDES_DIR, "eda_plots.png"), w=125)
 
     # =====================================================================
-    # Slide 5 - Metodologia: Modelos e Otimizacao
+    # Slide 5 - 4. Eixo Analítico Secundário: Bike Sharing
     # =====================================================================
-    pdf.add_section_slide("4", "Metodologia - Modelos e Otimização")
-    pdf.add_body_text("Modelos selecionados:")
-    pdf.ln(2)
-    pdf.add_bullet("Regressão Logística (class_weight='balanced') - Modelo linear interpretável")
-    pdf.add_bullet("Random Forest (class_weight='balanced') - Ensemble não-linear robusto")
-    pdf.add_bullet("Gradient Boosting - Ensemble não-linear baseado em boosting")
+    pdf.add_section_slide("4", "Eixo Analítico Secundário: Bike Sharing")
+    pdf.add_body_text(
+        "Paradigma de Regressão Contínua: Transposição analítica usando o conjunto de dados da UCI para prever locações acumuladas de bicicletas (cnt)."
+    )
     pdf.ln(3)
-    pdf.add_body_text("Hiperparâmetros otimizados via GridSearchCV:")
-    pdf.ln(2)
-    pdf.add_body_text("Regressão Logística:")
-    pdf.add_bullet("C (regularização inversa): [0.01, 0.1, 1, 10, 100]")
-    pdf.add_bullet("Penalty: L2 (Ridge)")
-    pdf.ln(2)
-    pdf.add_body_text("Random Forest:")
-    pdf.add_bullet("n_estimators: [100, 200, 300]")
-    pdf.add_bullet("max_depth: [5, 10, None]")
-    pdf.add_bullet("min_samples_split: [2, 5]")
-    pdf.add_bullet("min_samples_leaf: [1, 2]")
-    pdf.ln(2)
-    pdf.add_body_text("Gradient Boosting:")
-    pdf.add_bullet("n_estimators: [50, 100, 150]")
-    pdf.add_bullet("learning_rate: [0.01, 0.1, 0.2]")
-    pdf.add_bullet("max_depth: [3, 5]")
-    pdf.ln(2)
-    pdf.add_body_text("Validação cruzada: StratifiedKFold (5 folds) no Treino\n"
-                      "Métrica de otimização: F1-Score (classe minoritária)\n"
-                      "Estratégia de balanceamento: class_weight='balanced' (onde aplicável)")
+    
+    # Desenho da Caixa de Alerta (Estilo Alert Box)
+    pdf.set_fill_color(255, 251, 235)
+    pdf.set_draw_color(217, 119, 6)
+    pdf.set_line_width(0.4)
+    current_y = pdf.get_y()
+    pdf.rect(10, current_y, 277, 24, style="FD")
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_text_color(217, 119, 6)
+    pdf.text(13, current_y + 6, "Alerta de Data Leakage (Vazamento de Dados):")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(40, 40, 40)
+    pdf.set_xy(13, current_y + 8)
+    pdf.multi_cell(271, 5, "Remoção compulsória das colunas casual e registered. A soma de ambas equivale à variável alvo final. Mantê-las inviabilizaria o modelo preditivo real.")
+    
+    pdf.set_xy(10, current_y + 28)
+    pdf.add_bullet("Pré-processamento: Exclusão de IDs ordinais (instant) e binarização de variáveis de clima/temporada via One-Hot encoding.")
+    pdf.add_bullet("Modelos: Regressão Linear Múltipla (OLS) vs Random Forest Regressor (ensemble não-linear por média de predições).")
 
     # =====================================================================
-    # Slide 6 - Resultados e Comparação de Desempenho
+    # Slide 6 - 5. Modelos de Classificação e Hiperparâmetros
     # =====================================================================
-    # Exibe os melhores hiperparâmetros encontrados pelo GridSearchCV e
-    # uma tabela comparativa com 5 métricas para os três modelos.
-    pdf.add_section_slide("5", "Resultados e Comparação de Desempenho")
+    pdf.add_section_slide("5", "Modelos de Classificação e Hiperparâmetros")
+    pdf.add_bullet("Regressão Logística: Projeta probabilidades usando sigmoide e limites lineares. Otimizado hiperparâmetro de regularização C.")
+    pdf.add_bullet("Random Forest Classifier: Ensemble paralelo construído por agregação Bootstrap (Bagging) de árvores profundas. Hiperparâmetros: n_estimators e max_depth.")
+    pdf.add_bullet("Gradient Boosting Classifier: Treinamento sequencial onde cada árvore corrige os resíduos do conjunto anterior via gradiente.")
+    pdf.add_bullet("Estratégia de Custo Classweight: Atribuição de pesos inversamente proporcionais às frequências das classes (class_weight='balanced') na Regressão Logística e Random Forest para calibrar o modelo contra a assimetria.")
+    pdf.ln(3)
     pdf.add_body_text("Melhores hiperparâmetros encontrados:")
-    pdf.ln(2)
     pdf.set_font("Courier", "B", 10)
     pdf.set_text_color(25, 55, 109)
-    pdf.cell(0, 6, "Regressão Logística:", new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Courier", "", 9)
-    pdf.cell(0, 5, "  C=0.1, penalty=L2, solver=lbfgs", new_x="LMARGIN", new_y="NEXT")
-    pdf.ln(2)
-    pdf.set_font("Courier", "B", 10)
-    pdf.cell(0, 6, "Random Forest:", new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Courier", "", 9)
-    pdf.cell(0, 5, "  n_estimators=200, max_depth=5, min_samples_leaf=1", new_x="LMARGIN", new_y="NEXT")
-    pdf.ln(2)
-    pdf.set_font("Courier", "B", 10)
-    pdf.cell(0, 6, "Gradient Boosting:", new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Courier", "", 9)
-    pdf.cell(0, 5, "  learning_rate=0.1, max_depth=3, n_estimators=150", new_x="LMARGIN", new_y="NEXT")
-    pdf.ln(4)
+    pdf.cell(0, 5, "  Regressão Logística: C=0.1, penalty=L2, solver=lbfgs", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 5, "  Random Forest: n_estimators=200, max_depth=5, min_samples_split=5", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 5, "  Gradient Boosting: learning_rate=0.2, max_depth=3, n_estimators=100", new_x="LMARGIN", new_y="NEXT")
 
-    pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(0, 7, "Comparação de Métricas (conjunto de teste):", new_x="LMARGIN", new_y="NEXT")
-    pdf.ln(2)
+    # =====================================================================
+    # Slide 7 - 6. Modelos de Regressão e Hiperparâmetros
+    # =====================================================================
+    pdf.add_section_slide("6", "Modelos de Regressão e Hiperparâmetros")
+    pdf.add_bullet("Regressão Linear Múltipla: Ajusta uma função de coeficientes lineares tentando encontrar a reta que minimiza a soma dos erros quadráticos.")
+    pdf.add_bullet("Random Forest Regressor: Combina múltiplas subárvores de regressão para reduzir a variância e prever o valor contínuo final através da média aritmética das predições de cada árvore.")
+    pdf.add_bullet("Otimização por GridSearchCV: Ambos os paradigmas (classificação e regressão) utilizam busca em grade com validação cruzada K-Fold (5 folds) na partição de treino para selecionar os parâmetros ideais.")
 
-    # Tenta carregar as métricas reais salvas pelo main.py
+    # =====================================================================
+    # Slide 8 - 7. Métricas de Avaliação e o Paradoxo da Acurácia
+    # =====================================================================
+    pdf.add_section_slide("7", "Métricas de Avaliação e o Paradoxo da Acurácia")
+    pdf.add_body_text("Métricas de Classificação (Turnover):")
+    pdf.add_bullet("Acurácia é enganosa em bases assimétricas.")
+    pdf.add_bullet("F1-Score é a métrica principal de seleção (harmonização de Precisão e Recall).")
+    pdf.add_bullet("Recall (Sensibilidade) é priorizado para o RH interceptar desligamentos.")
+    pdf.ln(2)
+    pdf.add_body_text("Métricas de Regressão (Bike Sharing):")
+    pdf.add_bullet("RMSE: Penaliza desvios residuais grandes elevados ao quadrado.")
+    pdf.add_bullet("MAE: Desvio médio linear tangível das locações.")
+    pdf.add_bullet("R² Score: Percentual explicativo da variância.")
+
+    # =====================================================================
+    # Slide 9 - 8. Resultados do Modelo de Turnover (Teste)
+    # =====================================================================
+    pdf.add_section_slide("8", "Resultados do Modelo de Turnover (Teste)")
+    
+    current_y = pdf.get_y()
+    
+    # Carrega métricas reais
     metrics_path = os.path.join(BASE_DIR, "slides", "metrics.json")
     metrics = {}
     if os.path.exists(metrics_path):
@@ -323,13 +321,11 @@ def build_presentation() -> None:
         except Exception:
             pass
 
-    # Helper para formatar metrica
     def get_val(model_name, metric_name):
         if model_name in metrics and metric_name in metrics[model_name]:
             return f"{metrics[model_name][metric_name]:.4f}".replace(".", ",")
-        return "[Aguardando]"
+        return "N/A"
 
-    # Helper para obter o melhor
     def get_best(metric_name):
         best_val = -1
         best_model = None
@@ -339,15 +335,11 @@ def build_presentation() -> None:
                 if val > best_val:
                     best_val = val
                     best_model = m
-        if best_model == "LogisticRegression":
-            return "RL"
-        elif best_model == "RandomForest":
-            return "RF"
-        elif best_model == "GradientBoosting":
-            return "GB"
+        if best_model == "LogisticRegression": return "RL"
+        elif best_model == "RandomForest": return "RF"
+        elif best_model == "GradientBoosting": return "GB"
         return "-"
 
-    # Tabela comparativa: 5 colunas (Métrica, RL, RF, GB, Melhor)
     data = [
         ["Métrica", "Reg. Logística", "Random Forest", "Grad. Boosting", "Melhor"],
         ["Acurácia", get_val("LogisticRegression", "accuracy"), get_val("RandomForest", "accuracy"), get_val("GradientBoosting", "accuracy"), get_best("accuracy")],
@@ -356,113 +348,49 @@ def build_presentation() -> None:
         ["F1-Score", get_val("LogisticRegression", "f1_score"), get_val("RandomForest", "f1_score"), get_val("GradientBoosting", "f1_score"), get_best("f1_score")],
         ["ROC-AUC", get_val("LogisticRegression", "roc_auc"), get_val("RandomForest", "roc_auc"), get_val("GradientBoosting", "roc_auc"), get_best("roc_auc")],
     ]
-    col_w = [55, 50, 50, 50, 25]
+    
+    # Tabela à esquerda
+    col_w = [30, 26, 26, 26, 14] # total = 122mm
+    pdf.set_y(current_y + 4)
     for i, row in enumerate(data):
-        pdf.set_x(33.5)
+        pdf.set_x(10)
         for j, cell in enumerate(row):
             if i == 0:
-                # Linha de cabecalho: fundo azul escuro, texto branco
-                pdf.set_font("Helvetica", "B", 10)
+                pdf.set_font("Helvetica", "B", 8)
                 pdf.set_fill_color(25, 55, 109)
                 pdf.set_text_color(255, 255, 255)
             elif j == 4:
-                # Coluna "Melhor": destaca o vencedor em vermelho
-                pdf.set_font("Helvetica", "B", 10)
+                pdf.set_font("Helvetica", "B", 8)
                 pdf.set_text_color(200, 50, 50)
                 pdf.set_fill_color(255, 235, 235)
             else:
-                # Linhas de dados: intercalacao de cinza claro e branco
-                pdf.set_font("Helvetica", "", 10)
+                pdf.set_font("Helvetica", "", 8)
                 pdf.set_text_color(40, 40, 40)
                 pdf.set_fill_color(245, 245, 245) if i % 2 == 0 else pdf.set_fill_color(255, 255, 255)
-            pdf.cell(col_w[j], 7, cell, border=1, fill=True, align="C")
+            pdf.cell(col_w[j], 6.5, cell, border=1, fill=True, align="C")
         pdf.ln()
-    pdf.ln(5)
 
-    # Slide 7 - Gráficos de Desempenho
-    # =====================================================================
-    pdf.add_section_slide("5.1", "Gráficos de Desempenho")
-    pdf.add_image_centered(os.path.join(SLIDES_DIR, "model_comparison.png"), w=140)
-    pdf.ln(3)
+    # Legenda da tabela
+    pdf.set_xy(10, pdf.get_y() + 4)
     pdf.set_font("Helvetica", "I", 9)
     pdf.set_text_color(100, 100, 100)
-    pdf.set_x(pdf.l_margin)
-    pdf.multi_cell(0, 5, "Figura: Comparação de métricas, curva ROC, matrizes de confusão e importância de features.")
+    pdf.multi_cell(122, 4.5, "A Regressão Logística foi selecionada no conjunto de validação (Val F1=0,5441) e provê a melhor sensibilidade operacional (Recall de 72,34%).")
 
-    # Slide 8 - Discussao dos Resultados
-    # =====================================================================
-    pdf.add_section_slide("6", "Discussão dos Resultados")
-    pdf.add_body_text("Análise comparativa:")
-    pdf.ln(2)
-    pdf.add_bullet(
-        "A Regressão Logística obteve melhor F1-Score (0,48) e Recall (0,72) no teste final, "
-        "demonstrando maior capacidade de identificar funcionários que realmente vão sair da empresa.",
-        bold_prefix="F1-Score e Recall: "
-    )
-    pdf.ln(2)
-    pdf.add_bullet(
-        "O Random Forest e Gradient Boosting obtiveram maior Acurácia (0,81 e 0,86), mas recall inferior, "
-        "o que é enganoso devido ao forte desbalanceamento dos dados (84% permanecem).",
-        bold_prefix="Acurácia: "
-    )
-    pdf.ln(2)
-    pdf.add_bullet(
-        "A Regressão Logística é mais indicada para este problema: prioriza a detecção de funcionários "
-        "em risco (Recall maior de 0,72), essencial para que o RH possa agir proativamente.",
-        bold_prefix="Conclusão: "
-    )
-    pdf.ln(3)
-    pdf.add_body_text("Importância do F1-Score como métrica principal:")
-    pdf.add_bullet("Acurácia é enganosa em datasets desbalanceados (um modelo que chute 'não' teria 84% de acurácia)")
-    pdf.add_bullet("F1-Score equilibra Precisão e Recall para a classe minoritária")
-    pdf.add_bullet("Class_weight='balanced' foi crucial para melhorar a detecção da classe positiva")
-
-    # Slide 9 - Conclusoes e Melhorias
-    # =====================================================================
-    pdf.add_section_slide("7", "Conclusões e Melhorias")
-    pdf.add_body_text("Conclusões:")
-    pdf.ln(2)
-    pdf.add_bullet(
-        "O modelo de Regressão Logística com class_weight='balanced' apresentou o melhor equilíbrio "
-        "entre detecção de saídas (Recall=0,72) e qualidade das predições (F1=0,48) no conjunto de teste.",
-        bold_prefix="Melhor Modelo: "
-    )
-    pdf.ln(2)
-    pdf.add_bullet(
-        "Fatores mais relevantes para turnover: horas extras (HoraExtra), baixa renda (RendaMensal), "
-        "distância de casa (DistanciaTrabalho), poucos anos de empresa e satisfação no trabalho.",
-        bold_prefix="Fatores de Risco: "
-    )
-    pdf.ln(3)
-    pdf.add_body_text("Possíveis melhorias:")
-    pdf.add_bullet("Testar SMOTE como alternativa ao class_weight='balanced'")
-    pdf.add_bullet("Explorar outros algoritmos: XGBoost, LightGBM, SVM, Redes Neurais")
-    pdf.add_bullet("Coletar mais dados para melhorar a generalização")
-    pdf.add_bullet("Análise de features importantes para ações direcionadas de RH")
-    pdf.add_bullet("Implementação de sistema de alerta em tempo real")
+    # Imagem à direita
+    img_path = os.path.join(SLIDES_DIR, "model_comparison.png")
+    if os.path.exists(img_path):
+        pdf.image(img_path, x=142, y=current_y + 2, w=145)
 
     # =====================================================================
-    # Slide 10 - Referencias e Repositorio
+    # Slide 10 - 9. Conclusão
     # =====================================================================
-    pdf.add_section_slide("", "Referências e Repositório")
-    pdf.add_body_text("Referências:")
-    pdf.add_bullet("IBM HR Analytics Employee Attrition & Performance - Kaggle")
-    pdf.add_bullet("Scikit-learn: Pipeline, GridSearchCV, ColumnTransformer")
-    pdf.add_bullet("Documentação: matplotlib, pandas, seaborn")
-    pdf.ln(5)
-    pdf.add_body_text("Repositório do Projeto:")
-    pdf.ln(2)
-    pdf.set_font("Courier", "", 11)
-    pdf.set_text_color(0, 102, 204)
-    pdf.cell(0, 8, "https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios", new_x="LMARGIN", new_y="NEXT")
-    pdf.ln(10)
-    pdf.set_font("Helvetica", "I", 10)
-    pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(0, 6, "Tecnologias: Python, scikit-learn, pandas, matplotlib, seaborn\n"
-                         "Container: jupyter/scipy-notebook via Podman\n"
-                         "Editor: Zed com Dev Containers")
-
-    # Gera o arquivo PDF final
+    pdf.add_section_slide("9", "Conclusão")
+    pdf.add_bullet("O modelo de Regressão Logística provou ser viável para antecipar evasões de talentos, permitindo ações proativas do RH (Recall = 72,34% no teste).")
+    pdf.add_bullet("Horas extras elevadas e remuneração mensal inferior destacam-se como os maiores alavancadores do desgaste corporativo.")
+    pdf.add_body_text("Links do Repositório GitHub e Colab:")
+    pdf.set_font("Courier", "", 10)
+    pdf.set_text_color(37, 99, 235)
+    pdf.cell(0, 6, "  https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios", new_x="LMARGIN", new_y="NEXT")
     pdf.output(OUTPUT_PDF)
     print(f"Apresentacao salva em: {OUTPUT_PDF}")
 
