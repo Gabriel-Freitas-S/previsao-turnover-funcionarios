@@ -22,6 +22,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+import os
+import json
+import joblib
 # Suprime warnings de convergencia e deprecacao para manter a saida limpa
 warnings.filterwarnings("ignore")
 
@@ -30,30 +33,110 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report, roc_auc_score, roc_curve
 )
 
-# Caminho relativo ao diretorio src/ - os graficos serao salvos em slides/
-DATA_PATH = "../data/HR_Employee_Attrition.csv"
+# Caminho robusto absoluto baseado na localizacao deste arquivo
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_PATH = os.path.join(BASE_DIR, "data", "HR_Employee_Attrition.csv")
 RANDOM_STATE = 42
+
+COLUMNS_MAP = {
+    'Age': 'Idade',
+    'Attrition': 'Turnover',
+    'BusinessTravel': 'ViagemNegocios',
+    'DailyRate': 'ValorDiaria',
+    'Department': 'Departamento',
+    'DistanceFromHome': 'DistanciaTrabalho',
+    'Education': 'Escolaridade',
+    'EducationField': 'AreaFormacao',
+    'EmployeeCount': 'ContagemFuncionarios',
+    'EmployeeNumber': 'NumeroFuncionario',
+    'EnvironmentSatisfaction': 'SatisfacaoAmbiente',
+    'Gender': 'Genero',
+    'HourlyRate': 'ValorHora',
+    'JobInvolvement': 'EnvolvimentoTrabalho',
+    'JobLevel': 'NivelCargo',
+    'JobRole': 'Cargo',
+    'JobSatisfaction': 'SatisfacaoCargo',
+    'MaritalStatus': 'EstadoCivil',
+    'MonthlyIncome': 'RendaMensal',
+    'MonthlyRate': 'ValorMensal',
+    'NumCompaniesWorked': 'NumeroEmpresasTrabalhou',
+    'Over18': 'MaiorDe18',
+    'OverTime': 'HoraExtra',
+    'PercentSalaryHike': 'PercentualAumentoSalario',
+    'PerformanceRating': 'AvaliacaoDesempenho',
+    'RelationshipSatisfaction': 'SatisfacaoRelacionamento',
+    'StandardHours': 'HorasPadrao',
+    'StockOptionLevel': 'NivelOpcaoAcoes',
+    'TotalWorkingYears': 'TotalAnosTrabalhados',
+    'TrainingTimesLastYear': 'QtdTreinamentosAnoPassado',
+    'WorkLifeBalance': 'EquilibrioVidaTrabalho',
+    'YearsAtCompany': 'AnosEmpresa',
+    'YearsInCurrentRole': 'AnosCargoAtual',
+    'YearsSinceLastPromotion': 'AnosDesdeUltimaPromocao',
+    'YearsWithCurrManager': 'AnosGerenteAtual'
+}
+
+def translate_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    # 1. Traduzir valores categoricos
+    categorical_translation = {
+        'Attrition': {'Yes': 'Sim', 'No': 'Não'},
+        'OverTime': {'Yes': 'Sim', 'No': 'Não'},
+        'BusinessTravel': {
+            'Travel_Rarely': 'Rara',
+            'Travel_Frequently': 'Frequente',
+            'Non-Travel': 'Não Viaja'
+        },
+        'Gender': {'Male': 'Masculino', 'Female': 'Feminino'},
+        'MaritalStatus': {
+            'Single': 'Solteiro',
+            'Married': 'Casado',
+            'Divorced': 'Divorciado'
+        },
+        'Department': {
+            'Sales': 'Vendas',
+            'Research & Development': 'Pesquisa & Desenvolvimento',
+            'Human Resources': 'Recursos Humanos'
+        },
+        'JobRole': {
+            'Sales Executive': 'Executivo de Vendas',
+            'Research Scientist': 'Cientista de Pesquisa',
+            'Laboratory Technician': 'Técnico de Laboratório',
+            'Manufacturing Director': 'Diretor de Manufatura',
+            'Healthcare Representative': 'Representante de Saúde',
+            'Manager': 'Gerente',
+            'Sales Representative': 'Representante de Vendas',
+            'Research Director': 'Diretor de Pesquisa',
+            'Human Resources': 'Recursos Humanos'
+        },
+        'EducationField': {
+            'Life Sciences': 'Ciências da Vida',
+            'Medical': 'Medicina',
+            'Marketing': 'Marketing',
+            'Technical Degree': 'Curso Técnico',
+            'Other': 'Outro',
+            'Human Resources': 'Recursos Humanos'
+        }
+    }
+    
+    for col, mapping in categorical_translation.items():
+        if col in df.columns:
+            df[col] = df[col].map(mapping).fillna(df[col])
+            
+    df = df.rename(columns=COLUMNS_MAP)
+    return df
 
 def load_data(path: str = DATA_PATH) -> pd.DataFrame:
     """
-    Carrega o dataset IBM HR a partir de um arquivo CSV.
-
-    O encoding utf-8-sig remove o BOM (Byte Order Mark) que alguns
-    arquivos CSV exportados do Excel podem conter no inicio.
-
-    Args:
-        path: Caminho absoluto ou relativo para o arquivo CSV.
-
-    Returns:
-        DataFrame do Pandas com os dados carregados.
+    Carrega o dataset IBM HR a partir de um arquivo CSV e traduz para Portugues.
     """
     df = pd.read_csv(path, encoding="utf-8-sig")
+    df = translate_dataframe(df)
     return df
 
 def explore_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -71,89 +154,58 @@ def explore_data(df: pd.DataFrame) -> pd.DataFrame:
     print(f"\nColunas: {df.columns.tolist()}")
     print(f"\nTipos:\n{df.dtypes.value_counts()}")
     print(f"\nValores nulos:\n{df.isnull().sum().sum()}")
-    attrition_dist = df["Attrition"].value_counts()
-    attrition_pct = df["Attrition"].value_counts(normalize=True) * 100
-    print(f"\nDistribuicao Attrition:\n{attrition_dist}\n{attrition_pct.round(2)}")
+    attrition_dist = df["Turnover"].value_counts()
+    attrition_pct = df["Turnover"].value_counts(normalize=True) * 100
+    print(f"\nDistribuicao Turnover:\n{attrition_dist}\n{attrition_pct.round(2)}")
     return df
 
 def plot_eda(df: pd.DataFrame) -> None:
     """
     Gera graficos de Analise Exploratoria de Dados (EDA) e salva como PNG.
-
-    6 subplots abordando:
-        - Distribuicao da variavel alvo (countplot)
-        - Idade vs Attrition (boxplot) - funcionarios mais jovens saem mais?
-        - Renda mensal vs Attrition (boxplot) - menor renda leva a turnover?
-        - Attrition por departamento (barras empilhadas)
-        - Hora extra vs Attrition (countplot)
-        - Attrition por cargo (countplot)
-
-    Os graficos sao salvos em slides/eda_plots.png para uso nos slides.
-
-    Args:
-        df: DataFrame com os dados completos.
     """
     # Cria uma figura 2x3 com tamanho 15x10 polegadas
     fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-    fig.suptitle("Analise Exploratoria de Dados", fontsize=16)
+    fig.suptitle("Analise Exploratoria de Dados (EDA)", fontsize=16)
 
     # (1,1) - Distribuicao da variavel alvo (balanceamento das classes)
-    sns.countplot(data=df, x="Attrition", hue="Attrition", ax=axes[0, 0], legend=False)
-    axes[0, 0].set_title("Distribuicao de Attrition")
+    sns.countplot(data=df, x="Turnover", hue="Turnover", ax=axes[0, 0], legend=False)
+    axes[0, 0].set_title("Distribuicao de Turnover")
 
-    # (1,2) - Idade vs Attrition: funcionarios mais jovens tendem a sair mais
-    sns.boxplot(data=df, x="Attrition", y="Age", hue="Attrition", ax=axes[0, 1], legend=False)
-    axes[0, 1].set_title("Idade vs Attrition")
+    # (1,2) - Idade vs Turnover
+    sns.boxplot(data=df, x="Turnover", y="Idade", hue="Turnover", ax=axes[0, 1], legend=False)
+    axes[0, 1].set_title("Idade vs Turnover")
 
-    # (1,3) - Renda mensal: turnover e mais frequente em salarios mais baixos
-    sns.boxplot(data=df, x="Attrition", y="MonthlyIncome", hue="Attrition", ax=axes[0, 2], legend=False)
-    axes[0, 2].set_title("Renda Mensal vs Attrition")
+    # (1,3) - Renda mensal vs Turnover
+    sns.boxplot(data=df, x="Turnover", y="RendaMensal", hue="Turnover", ax=axes[0, 2], legend=False)
+    axes[0, 2].set_title("Renda Mensal vs Turnover")
 
-    # (2,1) - Proporcao de attrition por departamento (barras empilhadas)
-    att_by_dept = df.groupby("Department")["Attrition"].value_counts(normalize=True).unstack() * 100
+    # (2,1) - Proporcao de turnover por departamento (barras empilhadas)
+    att_by_dept = df.groupby("Departamento")["Turnover"].value_counts(normalize=True).unstack() * 100
     att_by_dept.plot(kind="bar", stacked=True, ax=axes[1, 0], color=["#4CAF50", "#F44336"])
-    axes[1, 0].set_title("Attrition por Departamento (%)")
+    axes[1, 0].set_title("Turnover por Departamento (%)")
     axes[1, 0].set_ylabel("Percentual")
-    axes[1, 0].legend(title="Attrition")
+    axes[1, 0].legend(title="Turnover")
 
-    # (2,2) - Horas extras aumentam significativamente o risco de turnover
-    sns.countplot(data=df, x="OverTime", hue="Attrition", ax=axes[1, 1])
-    axes[1, 1].set_title("Hora Extra vs Attrition")
+    # (2,2) - Horas extras vs Turnover
+    sns.countplot(data=df, x="HoraExtra", hue="Turnover", ax=axes[1, 1])
+    axes[1, 1].set_title("Hora Extra vs Turnover")
 
-    # (2,3) - Distribuicao de attrition por cargo (rotacionar labels para legibilidade)
-    sns.countplot(data=df, x="JobRole", hue="Attrition", ax=axes[1, 2])
-    axes[1, 2].set_title("Attrition por Cargo")
+    # (2,3) - Turnover por Cargo
+    sns.countplot(data=df, x="Cargo", hue="Turnover", ax=axes[1, 2])
+    axes[1, 2].set_title("Turnover por Cargo")
     axes[1, 2].tick_params(axis="x", rotation=45)
 
     plt.tight_layout()
-    plt.savefig("../slides/eda_plots.png", dpi=150, bbox_inches="tight")
-    print("Graficos EDA salvos em slides/eda_plots.png")
+    output_path = os.path.join(BASE_DIR, "slides", "eda_plots.png")
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    print(f"Graficos EDA salvos em {output_path}")
 
 def preprocess_data(df: pd.DataFrame):
     """
     Separa features (X) e target (y) e remove colunas irrelevantes.
-
-    Colunas removidas:
-        - Attrition: variavel alvo (vira y)
-        - EmployeeCount: valor constante (1 para todos os registros)
-        - StandardHours: valor constante (80 para todos)
-        - Over18: valor constante (Y para todos)
-        - EmployeeNumber: identificador unico, sem poder preditivo
-
-    A variavel alvo e mapeada de categorico (Yes/No) para binario (1/0).
-
-    Args:
-        df: DataFrame completo.
-
-    Returns:
-        X (DataFrame): features para modelagem.
-        y (Series): variavel alvo binaria (1=Yes, 0=No).
     """
-    # EmployeeCount, StandardHours e Over18 possuem variancia zero (valor unico
-    # para todas as linhas) - nao agregam informacao ao modelo.
-    # EmployeeNumber e um identificador sequencial, sem correlacao com turnover.
-    X = df.drop(columns=["Attrition", "EmployeeCount", "StandardHours", "Over18", "EmployeeNumber"])
-    y = df["Attrition"].map({"Yes": 1, "No": 0})
+    X = df.drop(columns=["Turnover", "ContagemFuncionarios", "HorasPadrao", "MaiorDe18", "NumeroFuncionario"])
+    y = df["Turnover"].map({"Sim": 1, "Não": 0})
     return X, y
 
 def build_preprocessor(X: pd.DataFrame):
@@ -215,11 +267,15 @@ def create_models():
         - class_weight='balanced': mesmo principio de balanceamento.
         - random_state=42: reprodutibilidade.
 
+    Modelo 3 - Gradient Boosting:
+        - random_state=42: reprodutibilidade.
+
     Grids:
         - Reg. Logistica: busca o melhor C (regularizacao inversa) para
           controlar overfitting. Valores menores = mais regularizacao.
         - Random Forest: busca profundidade maxima, numero de arvores,
           e criterios de parada (min_samples_split, min_samples_leaf).
+        - Gradient Boosting: busca n_estimators, learning_rate e max_depth.
 
     Returns:
         models (dict): nome -> objeto estimator.
@@ -231,6 +287,9 @@ def create_models():
         ),
         "RandomForest": RandomForestClassifier(
             class_weight="balanced", random_state=RANDOM_STATE
+        ),
+        "GradientBoosting": GradientBoostingClassifier(
+            random_state=RANDOM_STATE
         ),
     }
     param_grids = {
@@ -245,12 +304,17 @@ def create_models():
             "classifier__min_samples_split": [2, 5],
             "classifier__min_samples_leaf": [1, 2],
         },
+        "GradientBoosting": {
+            "classifier__n_estimators": [50, 100, 150],
+            "classifier__learning_rate": [0.01, 0.1, 0.2],
+            "classifier__max_depth": [3, 5],
+        },
     }
     return models, param_grids
 
-def train_and_evaluate(X_train, X_test, y_train, y_test, preprocessor):
+def train_and_evaluate(X_train, X_val, X_test, y_train, y_val, y_test, preprocessor):
     """
-    Treina cada modelo com GridSearchCV e avalia no conjunto de teste.
+    Treina cada modelo com GridSearchCV e avalia nos conjuntos de validacao e teste.
 
     O pipeline completo e:
         1. Pre-processamento (fit apenas no treino)
@@ -265,8 +329,10 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, preprocessor):
 
     Args:
         X_train: features de treino.
+        X_val: features de validacao.
         X_test: features de teste.
         y_train: rotulos de treino.
+        y_val: rotulos de validacao.
         y_test: rotulos de teste.
         preprocessor: ColumnTransformer ja configurado.
 
@@ -280,8 +346,6 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, preprocessor):
         print(f"\n>>> Treinando {name} com GridSearchCV...")
 
         # Pipeline: pre-processamento -> classificador
-        # Isso garante que o ColumnTransformer seja aplicado corretamente
-        # dentro de cada fold da validacao cruzada, sem data leakage.
         pipe = Pipeline(steps=[
             ("preprocessor", preprocessor),
             ("classifier", model),
@@ -297,25 +361,49 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, preprocessor):
         )
         gs.fit(X_train, y_train)
 
+        # Predicoes no conjunto de validacao
+        y_val_pred = gs.predict(X_val)
+        y_val_proba = gs.predict_proba(X_val)[:, 1]
+        
         # Predicoes no conjunto de teste
-        y_pred = gs.predict(X_test)
-        # Probabilidades da classe positiva (indice 1) para ROC-AUC
-        y_proba = gs.predict_proba(X_test)[:, 1]
+        y_test_pred = gs.predict(X_test)
+        y_test_proba = gs.predict_proba(X_test)[:, 1]
+
+        # Obter feature importances se o classificador suportar
+        classifier = gs.best_estimator_.named_steps["classifier"]
+        feature_importances = None
+        if hasattr(classifier, "feature_importances_"):
+            feature_importances = classifier.feature_importances_
+        elif hasattr(classifier, "coef_"):
+            feature_importances = classifier.coef_[0]
+
+        # Obter feature names do preprocessor
+        feature_names = gs.best_estimator_.named_steps["preprocessor"].get_feature_names_out()
 
         # Colecao de todas as metricas para comparacao posterior
         results.append({
             "model": name,
+            "best_estimator": gs.best_estimator_,
             "best_params": gs.best_params_,
             "best_score": gs.best_score_,          # F1 medio da validacao cruzada
-            "accuracy": accuracy_score(y_test, y_pred),
-            "precision": precision_score(y_test, y_pred),
-            "recall": recall_score(y_test, y_pred),
-            "f1_score": f1_score(y_test, y_pred),
-            "roc_auc": roc_auc_score(y_test, y_proba),
-            "y_pred": y_pred,
-            "y_proba": y_proba,
-            "confusion_matrix": confusion_matrix(y_test, y_pred),
-            "classification_report": classification_report(y_test, y_pred),
+            
+            # Validação
+            "val_f1": f1_score(y_val, y_val_pred),
+            "val_recall": recall_score(y_val, y_val_pred),
+            "val_roc_auc": roc_auc_score(y_val, y_val_proba),
+
+            # Teste (para plot_results)
+            "accuracy": accuracy_score(y_test, y_test_pred),
+            "precision": precision_score(y_test, y_test_pred),
+            "recall": recall_score(y_test, y_test_pred),
+            "f1_score": f1_score(y_test, y_test_pred),
+            "roc_auc": roc_auc_score(y_test, y_test_proba),
+            "y_pred": y_test_pred,
+            "y_proba": y_test_proba,
+            "confusion_matrix": confusion_matrix(y_test, y_test_pred),
+            "classification_report": classification_report(y_test, y_test_pred),
+            "feature_importances": feature_importances,
+            "feature_names": feature_names
         })
     return results
 
@@ -323,20 +411,24 @@ def plot_results(results: list, y_test: pd.Series) -> None:
     """
     Gera grafico comparativo entre os modelos e salva como PNG.
 
-    Layout 2x2:
-        (1,1) - Barras comparativas: Acuracia, Precisao, Recall, F1, AUC
-        (1,2) - Curva ROC sobreposta dos dois modelos
-        (2,1) - Matrizes de confusao (sobrepoe a ultima)
-        (2,2) - Top 10 features mais importantes (Random Forest)
+    Layout 2x3:
+        Linha superior:
+        - (0,0) - Barras comparativas de metricas (Acuracia, Precisao, Recall, F1, AUC)
+        - (0,1) - Curva ROC sobreposta dos modelos
+        - (0,2) - Top 10 features mais importantes (Random Forest)
+        Linha inferior:
+        - (1,0) - Matriz de confusao - LogisticRegression
+        - (1,1) - Matriz de confusao - RandomForest
+        - (1,2) - Matriz de confusao - GradientBoosting
 
     Args:
         results: lista de dicionarios com as metricas de cada modelo.
         y_test: rotulos verdadeiros do conjunto de teste.
     """
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle("Comparacao de Modelos - Previsao de Turnover", fontsize=16)
+    fig, axes = plt.subplots(2, 3, figsize=(18, 11))
+    fig.suptitle("Comparacao de Modelos - Previsao de Turnover", fontsize=16, fontweight="bold", y=0.98)
 
-    # (1,1) - Grafico de barras com todas as metricas lado a lado
+    # (0,0) - Grafico de barras com todas as metricas lado a lado
     metrics_df = pd.DataFrame([
         {"Model": r["model"], "Acuracia": r["accuracy"],
          "Precisao": r["precision"], "Recall": r["recall"],
@@ -345,60 +437,69 @@ def plot_results(results: list, y_test: pd.Series) -> None:
     ]).set_index("Model")
 
     metrics_df.plot(kind="bar", ax=axes[0, 0], rot=0, colormap="viridis")
-    axes[0, 0].set_title("Metricas de Desempenho")
-    axes[0, 0].set_ylim(0, 1)      # Metricas sao proporcoes entre 0 e 1
-    axes[0, 0].legend(loc="lower right")
+    axes[0, 0].set_title("Metricas de Desempenho", fontsize=12, fontweight="bold")
+    axes[0, 0].set_ylim(0, 1.05)      # Metricas sao proporcoes entre 0 e 1
+    axes[0, 0].legend(loc="lower left", fontsize=8)
     axes[0, 0].grid(axis="y", alpha=0.3)
+    axes[0, 0].set_xlabel("")
 
-    # (2,1) - Matriz de confusao (a ultima sobrescreve, mas valores sao exibidos)
-    # Idealmente seria um subplot para cada modelo, mas para simplificar
-    # exibimos a matriz do ultimo modelo processado.
-    for r in results:
-        sns.heatmap(r["confusion_matrix"], annot=True, fmt="d",
-                    cmap="Blues", ax=axes[1, 0])
-        axes[1, 0].set_title(f"Matriz de Confusao - {r['model']}")
-        axes[1, 0].set_xlabel("Previsto")
-        axes[1, 0].set_ylabel("Real")
-
-    # (1,2) - Curva ROC: taxa de verdadeiro positivo vs taxa de falso positivo
-    # AUC (Area Under the Curve) mede a capacidade de discriminacao do modelo.
+    # (0,1) - Curva ROC
     for r in results:
         fpr, tpr, _ = roc_curve(y_test, r["y_proba"])
         axes[0, 1].plot(fpr, tpr, label=f"{r['model']} (AUC={r['roc_auc']:.3f})")
-    # Linha diagonal representa um classificador aleatorio (AUC=0.5)
     axes[0, 1].plot([0, 1], [0, 1], "k--", alpha=0.3)
-    axes[0, 1].set_title("Curva ROC")
+    axes[0, 1].set_title("Curva ROC", fontsize=12, fontweight="bold")
     axes[0, 1].set_xlabel("Taxa de Falso Positivo")
     axes[0, 1].set_ylabel("Taxa de Verdadeiro Positivo")
-    axes[0, 1].legend()
+    axes[0, 1].legend(fontsize=8)
     axes[0, 1].grid(alpha=0.3)
 
-    # (2,2) - Importancia de features do Random Forest (top 10)
-    # O Random Forest possui o atributo feature_importances_ que indica
-    # o peso relativo de cada feature na decisao das arvores.
+    # (0,2) - Importancia de features do Random Forest (top 10)
     fi_data = []
+    feature_names = None
     for r in results:
         if r["model"] == "RandomForest":
             fi = r.get("feature_importances")
+            feature_names = r.get("feature_names")
             if fi is not None:
                 fi_data.append((r["model"], fi))
 
     if fi_data:
         _, fi = fi_data[0]
-        # Indices das 10 features mais importantes, ordenados decrescentemente
         fi_sorted = fi.argsort()[-10:][::-1]
-        axes[1, 1].barh(range(10), fi[fi_sorted], color="steelblue")
-        axes[1, 1].set_title("Top 10 Features - Random Forest")
-        axes[1, 1].set_yticks(range(10))
-        axes[1, 1].invert_yaxis()  # Maior importancia no topo
+        if feature_names is not None:
+            cleaned_names = [str(feature_names[idx]).replace("cat__", "").replace("num__", "") for idx in fi_sorted]
+            axes[0, 2].barh(range(10), fi[fi_sorted], color="steelblue")
+            axes[0, 2].set_yticks(range(10))
+            axes[0, 2].set_yticklabels(cleaned_names, fontsize=8)
+        else:
+            axes[0, 2].barh(range(10), fi[fi_sorted], color="steelblue")
+            axes[0, 2].set_yticks(range(10))
+            axes[0, 2].set_yticklabels(range(10))
+        axes[0, 2].set_title("Top 10 Features - Random Forest", fontsize=12, fontweight="bold")
+        axes[0, 2].invert_yaxis()
     else:
-        axes[1, 1].text(0.5, 0.5, "Feature importance\nindisponivel",
+        axes[0, 2].text(0.5, 0.5, "Feature importance\nindisponivel",
                         ha="center", va="center")
-        axes[1, 1].set_title("Importancia das Features")
+        axes[0, 2].set_title("Importancia das Features", fontsize=12, fontweight="bold")
 
+    # Linha inferior: Matrizes de confusao lado a lado
+    for i, r in enumerate(results):
+        ax = axes[1, i]
+        sns.heatmap(r["confusion_matrix"], annot=True, fmt="d",
+                    cmap="Blues", ax=ax, cbar=False)
+        ax.set_title(f"Matriz de Confusao\n{r['model']}", fontsize=11, fontweight="bold")
+        ax.set_xlabel("Previsto")
+        ax.set_ylabel("Real")
+        ax.set_xticklabels(["Fica", "Sai"])
+        ax.set_yticklabels(["Fica", "Sai"])
+
+    # Ajusta o layout para evitar sobreposicoes
     plt.tight_layout()
-    plt.savefig("../slides/model_comparison.png", dpi=150, bbox_inches="tight")
-    print("Grafico salvo em slides/model_comparison.png")
+    # Salva o grafico usando caminho robusto
+    output_path = os.path.join(BASE_DIR, "slides", "model_comparison.png")
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    print(f"Grafico salvo em {output_path}")
 
 def main():
     """
@@ -410,9 +511,9 @@ def main():
         3. Geracao dos graficos de EDA
         4. Pre-processamento (separacao X/y, remocao de colunas inuteis)
         5. Configuracao do preprocessor (ColumnTransformer)
-        6. Divisao treino/teste com stratified sampling
+        6. Divisao treino/val/teste com stratified sampling (60/20/20)
         7. Treinamento e avaliacao com GridSearchCV
-        8. Exibicao dos resultados no terminal
+        8. Exibicao dos resultados no terminal e persistencia do melhor modelo
         9. Geracao do grafico comparativo final
     """
     print("=" * 64)
@@ -433,38 +534,80 @@ def main():
     X, y = preprocess_data(df)
 
     # Etapa 5: Configuracao do pre-processador
-    # O ColumnTransformer e configurado ANTES da divisao treino/teste,
-    # mas o metodo fit() sera chamado APENAS no treino dentro do Pipeline.
     preprocessor, num_feat, cat_feat = build_preprocessor(X)
 
-    # Etapa 6: Divisao estratificada
-    # O parametro stratify=y garante que a proporcao 84/16 das classes
-    # seja mantida tanto no treino quanto no teste.
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, stratify=y, random_state=RANDOM_STATE
+    # Etapa 6: Divisao estratificada 60/20/20
+    # 1. Separar 60% para treino e 40% intermediario
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        X, y, test_size=0.4, stratify=y, random_state=RANDOM_STATE
     )
-    print(f"\nDivisao: Treino={X_train.shape[0]}, Teste={X_test.shape[0]}")
-    print(f"Attrition em treino:\n{y_train.value_counts(normalize=True).mul(100).round(2)}")
+    # 2. Dividir o intermediario em 50% val e 50% teste (resultando em 20% val e 20% teste do total)
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp, test_size=0.5, stratify=y_temp, random_state=RANDOM_STATE
+    )
+    
+    print(f"\nDivisao (60/20/20): Treino={X_train.shape[0]}, Validacao={X_val.shape[0]}, Teste={X_test.shape[0]}")
+    print(f"Turnover em treino:\n{y_train.value_counts(normalize=True).mul(100).round(2)}")
 
     # Etapa 7: Treinamento e avaliacao
-    results = train_and_evaluate(X_train, X_test, y_train, y_test, preprocessor)
+    results = train_and_evaluate(X_train, X_val, X_test, y_train, y_val, y_test, preprocessor)
 
-    # Etapa 8: Exibicao dos resultados
+    # Etapa 8: Exibicao dos resultados e persistencia
     print("\n" + "=" * 64)
     print("RESULTADOS - CLASSIFICACAO BINARIA (TURNOVER)")
     print("=" * 64)
+    
+    best_model_name = None
+    best_val_f1 = -1.0
+    best_pipeline = None
+
     for r in results:
         print(f"\n{'='*40}")
         print(f"Modelo: {r['model']}")
         print(f"Melhores hiperparametros: {r['best_params']}")
-        print(f"Melhor F1 (CV): {r['best_score']:.4f}")
-        print(f"Acuracia (Teste):  {r['accuracy']:.4f}")
+        print(f"Melhor F1 (CV Treino): {r['best_score']:.4f}")
+        print(f"--- VALIDACAO ---")
+        print(f"F1-Score:  {r['val_f1']:.4f}")
+        print(f"Recall:    {r['val_recall']:.4f}")
+        print(f"ROC-AUC:   {r['val_roc_auc']:.4f}")
+        print(f"--- TESTE FINAL ---")
+        print(f"Acuracia:  {r['accuracy']:.4f}")
         print(f"Precisao:  {r['precision']:.4f}")
         print(f"Recall:    {r['recall']:.4f}")
         print(f"F1-Score:  {r['f1_score']:.4f}")
         print(f"ROC-AUC:   {r['roc_auc']:.4f}")
-        print(f"\nRelatorio:\n{r['classification_report']}")
-        print(f"Matriz de Confusao:\n{r['confusion_matrix']}")
+        print(f"\nRelatorio Teste:\n{r['classification_report']}")
+        print(f"Matriz de Confusao Teste:\n{r['confusion_matrix']}")
+
+        # Selecao do melhor modelo baseado no F1 na Validacao
+        if r['val_f1'] > best_val_f1:
+            best_val_f1 = r['val_f1']
+            best_model_name = r['model']
+            best_pipeline = r['best_estimator']
+
+    print(f"\n>>> Melhor modelo selecionado (Val F1={best_val_f1:.4f}): {best_model_name}")
+
+    # Salva o melhor modelo final
+    model_path = os.path.join(BASE_DIR, "modelo_turnover.pkl")
+    joblib.dump(best_pipeline, model_path)
+    print(f"Melhor modelo persistido em: {model_path}")
+
+    # Salva métricas para preenchimento nos slides
+    metrics_dict = {}
+    for r in results:
+        metrics_dict[r["model"]] = {
+            "accuracy": float(r["accuracy"]),
+            "precision": float(r["precision"]),
+            "recall": float(r["recall"]),
+            "f1_score": float(r["f1_score"]),
+            "roc_auc": float(r["roc_auc"])
+        }
+    metrics_dict["best_model"] = best_model_name
+    
+    metrics_path = os.path.join(BASE_DIR, "slides", "metrics.json")
+    with open(metrics_path, "w") as f:
+        json.dump(metrics_dict, f, indent=4)
+    print(f"Metricas exportadas para: {metrics_path}")
 
     # Etapa 9: Grafico comparativo final
     plot_results(results, y_test)
