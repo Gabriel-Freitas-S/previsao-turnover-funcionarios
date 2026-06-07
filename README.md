@@ -1,136 +1,184 @@
-# Previsão de Rotatividade de Funcionários
+# Previsão de Rotatividade de Funcionários (Turnover)
 
-Classificação Binária para Turnover Corporativo usando Machine Learning.
-
-**Integrantes do Grupo:**
-- Gabriel Freitas Souza
-- Indyanny Rodrigues Peixinho
-
-[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4-orange)](https://scikit-learn.org)
-[![Status](https://img.shields.io/badge/Status-Concluído-green)]()
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gabriel-Freitas-S/previsao-turnover-funcionarios/blob/main/notebooks/previsao_turnover.ipynb)
 
-## Problema
+Projeto de **Machine Learning** para previsão de rotatividade (*turnover*) de funcionários usando o dataset **HR Analytics (Giri Pujar, Kaggle)**.
 
-Prever se um funcionário tem alta probabilidade de deixar a empresa (Turnover/Attrition).
-Trata-se de um problema de **Classificação Binária** com dados desbalanceados (84% permanecem, 16% saem).
+**Integrantes:** Gabriel Freitas Souza & Indyanny Rodrigues Peixinho  
+**Disciplina:** Machine Learning — Unidade 3
 
-**Relevância:** A saída repentina de funcionários gera custos de recrutamento, perda de conhecimento
-institucional e riscos à conformidade legal. A retenção preditiva de talentos é uma prioridade
-estratégica para RH.
+---
 
-## Dataset
+## 📊 Dataset
 
-**IBM HR Analytics Employee Attrition & Performance** (Kaggle)
+| Atributo | Valor |
+|---|---|
+| **Nome** | HR Analytics |
+| **Autor** | Giri Pujar |
+| **Fonte** | [Kaggle](https://www.kaggle.com/datasets/giripujar/hr-analytics) |
+| **Licença** | CC0: Public Domain |
+| **Registros** | 14.999 |
+| **Colunas** | 10 |
+| **Variável Alvo** | `saiu` (0 = ficou, 1 = saiu) |
+| **Taxa de Turnover** | ~23,6% |
 
-- 1470 registros, 35 atributos (23 numéricos, 7 categóricos restantes no X)
-- 0 valores nulos
-- Variável alvo: `Turnover` (Sim/Não)
+### Colunas (traduzidas para PT-BR)
 
-## Metodologia
+| Coluna | Original | Tipo | Descrição |
+|---|---|---|---|
+| `nivel_satisfacao` | satisfaction_level | Float [0–1] | Nível de satisfação do funcionário |
+| `ultima_avaliacao` | last_evaluation | Float [0–1] | Pontuação da última avaliação de desempenho |
+| `numero_projetos` | number_project | Inteiro | Quantidade de projetos atribuídos |
+| `media_horas_mensais` | average_montly_hours | Inteiro | Média de horas trabalhadas por mês |
+| `tempo_empresa` | time_spend_company | Inteiro | Anos de empresa |
+| `acidente_trabalho` | Work_accident | Binário (0/1) | Sofreu acidente de trabalho |
+| **`saiu` (alvo)** | left | **Binário (0/1)** | **Saiu da empresa** |
+| `promocao_ultimos_5anos` | promotion_last_5years | Binário (0/1) | Recebeu promoção nos últimos 5 anos |
+| `departamento` | Department / sales | Categórico | Departamento do funcionário |
+| `salario` | salary | Categórico | Faixa salarial: baixo, medio, alto |
 
-### Pré-processamento
-- Remoção de colunas sem variância (`ContagemFuncionarios`, `HorasPadrao`, `MaiorDe18`)
-- Remoção do identificador (`NumeroFuncionario`)
-- Codificação One-Hot para 7 variáveis categóricas
-- Padronização (StandardScaler) para variáveis numéricas
-- ColumnTransformer + Pipeline para evitar data leakage
-- Divisão: **60% treino / 20% validação / 20% teste** (estratificada)
+---
 
-### Modelos
-| Modelo | Hiperparâmetros Otimizados |
-|--------|---------------------------|
-| **Regressão Logística** | C=0.1, penalty=L2, solver=lbfgs, class_weight='balanced' |
-| **Random Forest** | n_estimators=200, max_depth=5, min_samples_leaf=1, min_samples_split=5, class_weight='balanced' |
-| **Gradient Boosting** | learning_rate=0.1, max_depth=3, n_estimators=150 | (Nota: n_estimators otimizado para 100 com learning_rate 0.2 na execução PT) |
+## 🤖 Modelos e Resultados
 
-### Otimização
-- GridSearchCV com validação cruzada StratifiedKFold (5 folds) no conjunto de treino
-- Seleção do melhor modelo baseada no F1-Score do conjunto de validação
-- Métrica de otimização: F1-Score (classe minoritária)
-- Estratégia de balanceamento: `class_weight='balanced'` (onde aplicável)
+Três classificadores treinados com **GridSearchCV + StratifiedKFold (5 folds)** otimizando **F1-Score**:
 
-## Resultados (Avaliação no Teste Final)
+| Métrica | Regressão Logística | Random Forest | Gradient Boosting |
+|---|---|---|---|
+| Acurácia | 98,40% | 98,77% | 98,60% |
+| Precisão | 95,08% | **97,72%** | 97,57% |
+| Recall | **98,31%** | 97,03% | 96,47% |
+| **F1-Score** ★ | 96,67% | **97,38%** | 97,02% |
+| ROC-AUC | 99,89% | 99,86% | **99,92%** |
 
-| Métrica | Reg. Logística | Random Forest | Gradient Boosting | Melhor |
-|---------|:-------------:|:-------------:|:-----------------:|:-----:|
-| Acurácia | 0,7619 | 0,8299 | **0,8605** | GB |
-| Precisão | 0,3736 | 0,4717 | **0,5938** | GB |
-| Recall | **0,7234** | 0,5319 | 0,4043 | RL |
-| F1-Score | 0,4928 | **0,5000** | 0,4810 | RF |
-| ROC-AUC | 0,7954 | 0,7615 | **0,8055** | GB |
+> ★ Métrica principal de seleção (desbalanceamento ~76% ficou / ~24% saiu)
 
-A **Regressão Logística** foi o modelo selecionado como vencedor no conjunto de validação (Val F1-Score = 0,5441), demonstrando também a melhor capacidade de identificar funcionários em risco de saída no conjunto de teste final com maior Recall (0,7234).
+### 🏆 Modelo Selecionado: **Gradient Boosting**
+Selecionado pelo maior **F1-Score no conjunto de validação (Val F1 = 0,9695)**.
 
-## Como Reproduzir
+**Melhores Hiperparâmetros (GridSearchCV):**
+- `Regressão Logística`: C=0.01 | penalty=l2 | solver=lbfgs
+- `Random Forest`: n_estimators=100 | max_depth=None | min_samples_split=2 | min_samples_leaf=1
+- `Gradient Boosting`: learning_rate=0.1 | max_depth=3 | n_estimators=100
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
+previsao-turnover-funcionarios/
+│
+├── data/
+│   ├── HR_Analytics.csv          # Dataset principal (14.999 registros, PT-BR)
+│   └── HR_Dados_Limpos.csv       # Dataset anterior (legado)
+│
+├── notebooks/
+│   └── previsao_turnover.ipynb   # Notebook completo com análise e modelagem
+│
+├── slides/
+│   ├── eda_plots.png             # Gráficos de EDA gerados pelo main.py
+│   ├── model_comparison.png      # Comparação de modelos gerada pelo main.py
+│   ├── metrics.json              # Métricas reais do último treinamento
+│   └── apresentacao_turnover.pdf # Apresentação PDF de 10 slides (A4 Paisagem)
+│
+├── src/
+│   ├── main.py                   # Pipeline de ML: treino, avaliação e EDA
+│   └── generate_slides.py        # Gerador de apresentação PDF
+│
+├── index.html                    # Interface web com visualização e modo slideshow
+├── modelo_turnover.pkl           # Melhor modelo persistido (GradientBoosting)
+├── requirements.txt              # Dependências do projeto
+└── README.md                     # Este arquivo
+```
+
+---
+
+## 🚀 Como Executar
 
 ### Pré-requisitos
-- Python 3.11+
-- python3-venv
-
-### Ambiente Virtual (recomendado)
 
 ```bash
-# Clonar o repositório
-git clone https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios.git
-cd previsao-turnover-funcionarios
-
-# Criar e ativar o ambiente virtual
+# Criar e ativar o virtualenv
 python3 -m venv .venv
 source .venv/bin/activate
 
 # Instalar dependências
 pip install -r requirements.txt
+```
 
-# Executar o pipeline completo
+### Executar o Pipeline de ML
+
+```bash
+# Treina os modelos, gera gráficos EDA e de comparação, exporta métricas e o pkl
 python3 src/main.py
+```
 
-# Gerar os slides
+### Gerar Apresentação PDF
+
+```bash
+# Gera slides/apresentacao_turnover.pdf (10 slides, A4 Paisagem)
 python3 src/generate_slides.py
 ```
 
-### Jupyter Notebook
+### Abrir Interface Web
 
 ```bash
-# Ativar o ambiente (se ainda não estiver ativo)
-source .venv/bin/activate
-
-# Iniciar o Jupyter Notebook
-python3 -m notebook
+# Abrir index.html no navegador (carrega métricas automaticamente do metrics.json)
+xdg-open index.html
 ```
 
-Abra o notebook em `notebooks/previsao_turnover.ipynb`.
+### Executar Notebook
 
-## Estrutura do Projeto
+```bash
+# Localmente
+jupyter notebook notebooks/previsao_turnover.ipynb
 
-```
-previsao-turnover-funcionarios/
-├── data/
-│   └── HR_Employee_Attrition.csv  # Dataset IBM HR
-├── notebooks/
-│   └── previsao_turnover.ipynb    # Jupyter Notebook interativo
-├── slides/
-│   ├── apresentacao_turnover.pdf  # Slides da apresentação (10 páginas)
-│   ├── eda_plots.png              # Gráficos da análise exploratória
-│   ├── model_comparison.png       # Comparação dos modelos
-│   └── metrics.json               # Métricas exportadas pelo main.py
-├── src/
-│   ├── main.py                 # Pipeline ML completo
-│   └── generate_slides.py      # Geração de slides em PDF
-├── SPEC/
-│   └── Trabalho Machine Learning C3.md  # Especificações do trabalho
-├── index.html                  # Página GitHub Pages
-├── modelo_turnover.pkl         # Melhor modelo salvo
-└── README.md                   # Este arquivo
+# Ou abrir direto no Google Colab
+# https://colab.research.google.com/github/Gabriel-Freitas-S/previsao-turnover-funcionarios/blob/main/notebooks/previsao_turnover.ipynb
 ```
 
-## Tecnologias
+---
 
-- **Python 3.14** — scikit-learn, pandas, matplotlib, seaborn, joblib
-- **Editor** — Zed
-- **Slides** — fpdf2 (PDF)
+## 🔍 Principais Insights (EDA)
 
-## Licença
+- **Satisfação** (`nivel_satisfacao` < 0,35): Fator mais preditivo de saída voluntária
+- **Carga horária**: Excesso (>250h/mês) ou subcarga (<150h) eleva a taxa de turnover
+- **Salário baixo** (`salario = baixo`): Maior concentração de desligamentos
+- **Sem promoção** nos últimos 5 anos: Amplifica significativamente o risco
+- **Departamentos** Vendas e Técnico: Maiores índices de rotatividade
 
-Projeto acadêmico — Machine Learning, Unidade 3.
+---
+
+## 📈 Divisão dos Dados (60 / 20 / 20 — Estratificada)
+
+| Partição | Registros | % Turnover |
+|---|---|---|
+| Treino | 8.999 | ~23,6% |
+| Validação | 3.000 | ~23,6% |
+| Teste Final | 3.000 | ~23,6% |
+
+> Particionamento estratificado garante a proporção de turnover em todas as partições.  
+> O `fit` do preprocessador ocorre **somente** no treino (prevenção de Data Leakage).
+
+---
+
+## 📦 Dependências
+
+```
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+fpdf2
+joblib
+nbformat
+```
+
+---
+
+## 🔗 Links
+
+- **Kaggle Dataset:** https://www.kaggle.com/datasets/giripujar/hr-analytics
+- **Google Colab:** https://colab.research.google.com/github/Gabriel-Freitas-S/previsao-turnover-funcionarios/blob/main/notebooks/previsao_turnover.ipynb
+- **GitHub:** https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios

@@ -1,10 +1,11 @@
 """
-GERADOR DE SLIDES EM PDF - PREVISAO DE TURNOVER
-=================================================
+GERADOR DE SLIDES EM PDF - PREVISAO DE TURNOVER (HR Analytics)
+===============================================================
 Gera uma apresentacao de 10 slides no formato A4 (210x297 mm)
 contendo descricao do problema, metodologia, resultados e conclusoes
 do projeto de Machine Learning.
 
+Dataset: HR Analytics - Kaggle (Giri Pujar) | CC0: Public Domain
 Dependencias: pip install -r ../requirements.txt
 Uso: python3 generate_slides.py
 Saida: ../slides/apresentacao_turnover.pdf
@@ -46,7 +47,7 @@ class SlidePDF(FPDF):
         if self.page_no() > 1:
             self.set_font("Helvetica", "I", 8)
             self.set_text_color(100, 100, 100)
-            self.cell(0, 8, "Previsão de Rotatividade de Funcionários - Machine Learning", align="R", new_x="LMARGIN", new_y="NEXT")
+            self.cell(0, 8, "Previsão de Rotatividade de Funcionários - HR Analytics (Kaggle)", align="R", new_x="LMARGIN", new_y="NEXT")
             self.set_draw_color(220, 220, 220)
             self.set_line_width(0.2)
             self.line(10, 15, 287, 15)
@@ -70,9 +71,6 @@ class SlidePDF(FPDF):
         Cria o slide de capa com titulo e subtitulo centralizados,
         alem de informacoes institucionais (disciplina e dataset).
 
-        A capa usa fonte maior (28pt para o titulo, 16pt para subtitulo)
-        e pula aproximadamente 50mm para centralizar verticalmente.
-
         Args:
             title: Titulo principal do projeto.
             subtitle: Subtitulo opcional (ex: descricao curta).
@@ -91,7 +89,7 @@ class SlidePDF(FPDF):
         self.set_font("Helvetica", "", 12)
         self.set_text_color(100, 100, 100)
         self.cell(0, 8, "Disciplina: Machine Learning - Unidade 3", align="C", new_x="LMARGIN", new_y="NEXT")
-        self.cell(0, 8, "Dataset: IBM HR Analytics Employee Attrition & Performance", align="C", new_x="LMARGIN", new_y="NEXT")
+        self.cell(0, 8, "Dataset: HR Analytics - Kaggle (Giri Pujar) | CC0: Public Domain", align="C", new_x="LMARGIN", new_y="NEXT")
         self.cell(0, 8, "Integrantes: Gabriel Freitas Souza, Indyanny Rodrigues Peixinho", align="C", new_x="LMARGIN", new_y="NEXT")
 
     def add_section_slide(self, section_num: str, title: str) -> None:
@@ -134,10 +132,6 @@ class SlidePDF(FPDF):
         Adiciona um item de lista com marcador ("- ") e suporte para
         prefixo em negrito.
 
-        Exemplo com bold_prefix:
-            add_bullet("texto explicativo", bold_prefix="F1-Score: ")
-            Resultado: "- F1-Score: texto explicativo"
-
         Args:
             text: Texto do item.
             size: Tamanho da fonte (default: 11pt).
@@ -156,9 +150,6 @@ class SlidePDF(FPDF):
         """
         Insere uma imagem centralizada horizontalmente na pagina.
 
-        A largura padrao (170mm) ocupa a maior parte da largura util
-        do A4 (210mm - 2*10mm margens = 190mm disponiveis).
-
         Args:
             img_path: Caminho absoluto ou relativo para o arquivo de imagem.
             w: Largura da imagem em mm (default: 170).
@@ -167,7 +158,6 @@ class SlidePDF(FPDF):
             True se a imagem foi inserida, False se o arquivo nao existe.
         """
         if os.path.exists(img_path):
-            # Calcula a posicao X para centralizar: (largura pagina - largura imagem) / 2
             x = (297 - w) / 2
             self.image(img_path, x=x, w=w)
             return True
@@ -187,18 +177,18 @@ def build_presentation() -> None:
     # =====================================================================
     pdf.add_title_slide(
         "Previsão de Rotatividade de Funcionários",
-        "Classificação Binária para Turnover de RH e Estudo de Caso Bike Sharing"
+        "Classificação Binária para Turnover com HR Analytics (Kaggle)"
     )
+
     # =====================================================================
     # Slide 2 - 1. Introdução e Relevância do Problema
     # =====================================================================
     pdf.add_section_slide("1", "Introdução e Relevância do Problema")
     pdf.add_body_text(
-        "Problema: Predição de saída voluntária de colaboradores (Turnover/Attrition) usando aprendizado de máquina supervisionado."
+        "Problema: Predição de saída voluntária de colaboradores (Turnover) usando aprendizado de máquina supervisionado."
     )
     pdf.ln(3)
-    
-    # Desenho da Caixa de Destaque (Estilo Highlight Box)
+
     pdf.set_fill_color(240, 246, 255)
     pdf.set_draw_color(37, 99, 235)
     pdf.set_line_width(0.4)
@@ -206,36 +196,42 @@ def build_presentation() -> None:
     pdf.rect(10, current_y, 277, 24, style="FD")
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(37, 99, 235)
-    pdf.text(13, current_y + 6, "Valor de Negócio (Retenção Estratégica e Fluxos Documentais):")
+    pdf.text(13, current_y + 6, "Valor de Negócio (Retenção Estratégica):")
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(40, 40, 40)
     pdf.set_xy(13, current_y + 8)
-    pdf.multi_cell(271, 5, "A evasão repentina de funcionários em posições-chave interrompe fluxos operacionais críticos e de faturamento. A predição atua mitigando custos de rescisão, recrutamento e perda do conhecimento institucional.")
-    
+    pdf.multi_cell(271, 5, "A evasão de funcionários interrompe fluxos operacionais críticos e gera custos de rescisão, recrutamento e treinamento. A predição antecipada permite ao RH agir proativamente antes do pedido de desligamento.")
+
     pdf.set_xy(10, current_y + 28)
-    pdf.add_bullet("Tipo de Problema: Classificação Binária (Classe 1 = Saiu, Classe 0 = Permaneceu)")
-    pdf.add_bullet("Desafio Principal: Lidar com o forte desbalanceamento nativo dos dados de RH (apenas ~16% de casos de saída).")
+    pdf.add_bullet("Tipo de Problema: Classificação Binária (Classe 1 = Saiu, Classe 0 = Ficou)")
+    pdf.add_bullet("Dataset: HR Analytics - Kaggle (Giri Pujar) - 14.999 registros, CC0: Public Domain")
+    pdf.add_bullet("Desafio Principal: Desbalanceamento (~76% ficou / ~24% saiu), exigindo métricas adequadas (F1-Score).")
 
     # =====================================================================
     # Slide 3 - 2. Obtenção e Preparação dos Dados
     # =====================================================================
     pdf.add_section_slide("2", "Obtenção e Preparação dos Dados")
-    pdf.add_body_text("Dataset: IBM HR Analytics Employee Attrition & Performance (1470 registros, 35 colunas).")
+    pdf.add_body_text("Dataset: HR Analytics - Kaggle (Giri Pujar) - 14.999 registros, 10 colunas, CC0: Public Domain.")
+    pdf.add_body_text("Colunas originais (traduzidas para PT-BR):")
+    pdf.add_bullet("nivel_satisfacao, ultima_avaliacao, numero_projetos, media_horas_mensais")
+    pdf.add_bullet("tempo_empresa, acidente_trabalho, promocao_ultimos_5anos, departamento, salario")
+    pdf.add_bullet("saiu (variável alvo binária: 0 = ficou, 1 = saiu)")
     pdf.ln(2)
-    pdf.add_bullet("Limpeza Crítica: Remoção de atributos sem variância (StandardHours, EmployeeCount, Over18) e crachá (EmployeeNumber).")
-    pdf.add_bullet("Transformação de Atributos: Codificação One-Hot para variáveis categóricas qualitativas e Normalização (StandardScaler) para variáveis contínuas salariais e de tempo.")
-    pdf.add_bullet("Blindagem contra Vazamento (Data Leakage): Uso de ColumnTransformer e Pipeline ajustados estritamente na base de treino.")
-    pdf.add_bullet("Particionamento (SPEC): Divisão estratificada em 60% Treino (882), 20% Validação (294) e 20% Teste (294).")
+    pdf.add_bullet("Pré-processamento: Sem remoção de colunas (ausência de IDs ou vazamento de dados).")
+    pdf.add_bullet("Codificação One-Hot: variáveis categóricas 'departamento' e 'salario'.")
+    pdf.add_bullet("Normalização (StandardScaler): features numéricas contínuas.")
+    pdf.add_bullet("Particionamento: Divisão estratificada em 60% Treino (8.999), 20% Validação (3.000) e 20% Teste (3.000).")
 
     # =====================================================================
     # Slide 4 - 3. Análise Exploratória de Dados (EDA)
     # =====================================================================
     pdf.add_section_slide("3", "Análise Exploratória de Dados (EDA)")
-    pdf.add_body_text("Mapeamento das Relações Organizacionais:")
-    pdf.add_bullet("Forte desbalanceamento nativo: 83,88% Não / 16,12% Sim.")
-    pdf.add_bullet("Horas Extras acumulam-se como o maior causador de evasão voluntária por estresse (Burnout).")
-    pdf.add_bullet("Salários baixos e início de carreira (poucos anos de casa) impulsionam transições externas.")
-    pdf.add_bullet("Vendas é o departamento com maior desgaste relativo.")
+    pdf.add_body_text("Principais Insights:")
+    pdf.add_bullet("Desbalanceamento moderado: ~76,4% ficou / ~23,6% saiu.")
+    pdf.add_bullet("Nível de satisfação muito baixo é o principal preditor de saída.")
+    pdf.add_bullet("Funcionários com excesso de horas mensais (>250h) ou carga insuficiente (<150h) saem mais.")
+    pdf.add_bullet("Salários baixos e falta de promoção nos últimos 5 anos correlacionam-se com turnover.")
+    pdf.add_bullet("Departamentos de Vendas e Técnico concentram mais desligamentos.")
     pdf.ln(2)
     pdf.add_image_centered(os.path.join(SLIDES_DIR, "eda_plots.png"), w=125)
 
@@ -247,8 +243,7 @@ def build_presentation() -> None:
         "Paradigma de Regressão Contínua: Transposição analítica usando o conjunto de dados da UCI para prever locações acumuladas de bicicletas (cnt)."
     )
     pdf.ln(3)
-    
-    # Desenho da Caixa de Alerta (Estilo Alert Box)
+
     pdf.set_fill_color(255, 251, 235)
     pdf.set_draw_color(217, 119, 6)
     pdf.set_line_width(0.4)
@@ -261,7 +256,7 @@ def build_presentation() -> None:
     pdf.set_text_color(40, 40, 40)
     pdf.set_xy(13, current_y + 8)
     pdf.multi_cell(271, 5, "Remoção compulsória das colunas casual e registered. A soma de ambas equivale à variável alvo final. Mantê-las inviabilizaria o modelo preditivo real.")
-    
+
     pdf.set_xy(10, current_y + 28)
     pdf.add_bullet("Pré-processamento: Exclusão de IDs ordinais (instant) e binarização de variáveis de clima/temporada via One-Hot encoding.")
     pdf.add_bullet("Modelos: Regressão Linear Múltipla (OLS) vs Random Forest Regressor (ensemble não-linear por média de predições).")
@@ -271,16 +266,11 @@ def build_presentation() -> None:
     # =====================================================================
     pdf.add_section_slide("5", "Modelos de Classificação e Hiperparâmetros")
     pdf.add_bullet("Regressão Logística: Projeta probabilidades usando sigmoide e limites lineares. Otimizado hiperparâmetro de regularização C.")
-    pdf.add_bullet("Random Forest Classifier: Ensemble paralelo construído por agregação Bootstrap (Bagging) de árvores profundas. Hiperparâmetros: n_estimators e max_depth.")
+    pdf.add_bullet("Random Forest Classifier: Ensemble paralelo construído por Bagging de árvores de decisão. Hiperparâmetros: n_estimators e max_depth.")
     pdf.add_bullet("Gradient Boosting Classifier: Treinamento sequencial onde cada árvore corrige os resíduos do conjunto anterior via gradiente.")
-    pdf.add_bullet("Estratégia de Custo Classweight: Atribuição de pesos inversamente proporcionais às frequências das classes (class_weight='balanced') na Regressão Logística e Random Forest para calibrar o modelo contra a assimetria.")
+    pdf.add_bullet("Estratégia class_weight='balanced': Atribuição de pesos inversamente proporcionais às frequências das classes, corrigindo o desbalanceamento.")
     pdf.ln(3)
-    pdf.add_body_text("Melhores hiperparâmetros encontrados:")
-    pdf.set_font("Courier", "B", 10)
-    pdf.set_text_color(25, 55, 109)
-    pdf.cell(0, 5, "  Regressão Logística: C=0.1, penalty=L2, solver=lbfgs", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 5, "  Random Forest: n_estimators=200, max_depth=5, min_samples_split=5", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 5, "  Gradient Boosting: learning_rate=0.2, max_depth=3, n_estimators=100", new_x="LMARGIN", new_y="NEXT")
+    pdf.add_body_text("Otimização: GridSearchCV com StratifiedKFold (5 folds) otimizando F1-Score.")
 
     # =====================================================================
     # Slide 7 - 6. Modelos de Regressão e Hiperparâmetros
@@ -308,10 +298,9 @@ def build_presentation() -> None:
     # Slide 9 - 8. Resultados do Modelo de Turnover (Teste)
     # =====================================================================
     pdf.add_section_slide("8", "Resultados do Modelo de Turnover (Teste)")
-    
+
     current_y = pdf.get_y()
-    
-    # Carrega métricas reais
+
     metrics_path = os.path.join(BASE_DIR, "slides", "metrics.json")
     metrics = {}
     if os.path.exists(metrics_path):
@@ -329,28 +318,27 @@ def build_presentation() -> None:
     def get_best(metric_name):
         best_val = -1
         best_model = None
-        for m in ["LogisticRegression", "RandomForest", "GradientBoosting"]:
+        for m in ["RegressaoLogistica", "RandomForest", "GradientBoosting"]:
             if m in metrics and metric_name in metrics[m]:
                 val = metrics[m][metric_name]
                 if val > best_val:
                     best_val = val
                     best_model = m
-        if best_model == "LogisticRegression": return "RL"
+        if best_model == "RegressaoLogistica": return "RL"
         elif best_model == "RandomForest": return "RF"
         elif best_model == "GradientBoosting": return "GB"
         return "-"
 
     data = [
         ["Métrica", "Reg. Logística", "Random Forest", "Grad. Boosting", "Melhor"],
-        ["Acurácia", get_val("LogisticRegression", "accuracy"), get_val("RandomForest", "accuracy"), get_val("GradientBoosting", "accuracy"), get_best("accuracy")],
-        ["Precisão", get_val("LogisticRegression", "precision"), get_val("RandomForest", "precision"), get_val("GradientBoosting", "precision"), get_best("precision")],
-        ["Recall", get_val("LogisticRegression", "recall"), get_val("RandomForest", "recall"), get_val("GradientBoosting", "recall"), get_best("recall")],
-        ["F1-Score", get_val("LogisticRegression", "f1_score"), get_val("RandomForest", "f1_score"), get_val("GradientBoosting", "f1_score"), get_best("f1_score")],
-        ["ROC-AUC", get_val("LogisticRegression", "roc_auc"), get_val("RandomForest", "roc_auc"), get_val("GradientBoosting", "roc_auc"), get_best("roc_auc")],
+        ["Acurácia", get_val("RegressaoLogistica", "accuracy"), get_val("RandomForest", "accuracy"), get_val("GradientBoosting", "accuracy"), get_best("accuracy")],
+        ["Precisão", get_val("RegressaoLogistica", "precision"), get_val("RandomForest", "precision"), get_val("GradientBoosting", "precision"), get_best("precision")],
+        ["Recall", get_val("RegressaoLogistica", "recall"), get_val("RandomForest", "recall"), get_val("GradientBoosting", "recall"), get_best("recall")],
+        ["F1-Score", get_val("RegressaoLogistica", "f1_score"), get_val("RandomForest", "f1_score"), get_val("GradientBoosting", "f1_score"), get_best("f1_score")],
+        ["ROC-AUC", get_val("RegressaoLogistica", "roc_auc"), get_val("RandomForest", "roc_auc"), get_val("GradientBoosting", "roc_auc"), get_best("roc_auc")],
     ]
-    
-    # Tabela à esquerda
-    col_w = [30, 26, 26, 26, 14] # total = 122mm
+
+    col_w = [30, 26, 26, 26, 14]
     pdf.set_y(current_y + 4)
     for i, row in enumerate(data):
         pdf.set_x(10)
@@ -370,13 +358,12 @@ def build_presentation() -> None:
             pdf.cell(col_w[j], 6.5, cell, border=1, fill=True, align="C")
         pdf.ln()
 
-    # Legenda da tabela
     pdf.set_xy(10, pdf.get_y() + 4)
     pdf.set_font("Helvetica", "I", 9)
     pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(122, 4.5, "A Regressão Logística foi selecionada no conjunto de validação (Val F1=0,5441) e provê a melhor sensibilidade operacional (Recall de 72,34%).")
+    best_name = metrics.get("best_model", "N/A")
+    pdf.multi_cell(122, 4.5, f"Modelo selecionado na validação (melhor Val F1): {best_name}.")
 
-    # Imagem à direita
     img_path = os.path.join(SLIDES_DIR, "model_comparison.png")
     if os.path.exists(img_path):
         pdf.image(img_path, x=142, y=current_y + 2, w=145)
@@ -385,8 +372,9 @@ def build_presentation() -> None:
     # Slide 10 - 9. Conclusão
     # =====================================================================
     pdf.add_section_slide("9", "Conclusão")
-    pdf.add_bullet("O modelo de Regressão Logística provou ser viável para antecipar evasões de talentos, permitindo ações proativas do RH (Recall = 72,34% no teste).")
-    pdf.add_bullet("Horas extras elevadas e remuneração mensal inferior destacam-se como os maiores alavancadores do desgaste corporativo.")
+    pdf.add_bullet("O pipeline de Machine Learning demonstrou eficácia na identificação de colaboradores com risco de desligamento usando o dataset HR Analytics (Kaggle).")
+    pdf.add_bullet("O nível de satisfação e a média de horas mensais são os atributos mais preditivos de turnover.")
+    pdf.add_bullet("Salário baixo e ausência de promoção nos últimos 5 anos amplificam significativamente o risco de saída.")
     pdf.add_body_text("Links do Repositório GitHub e Colab:")
     pdf.set_font("Courier", "", 10)
     pdf.set_text_color(37, 99, 235)

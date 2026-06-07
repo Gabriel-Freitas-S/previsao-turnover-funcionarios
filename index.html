@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Previsão de Rotatividade de Funcionários — Machine Learning</title>
+<title>Previsão de Rotatividade de Funcionários — HR Analytics (Kaggle)</title>
+<meta name="description" content="Projeto de Machine Learning para previsão de turnover de funcionários usando o dataset HR Analytics (Giri Pujar, Kaggle). Classificação binária com Regressão Logística, Random Forest e Gradient Boosting.">
 <!-- Google Fonts: Outfit e Inter -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -592,17 +593,18 @@
 <header class="hero">
   <div class="badges">
     <span class="badge">🎓 Trabalho de Machine Learning (Unidade 3)</span>
-    <span class="badge">📊 Classificação vs Regressão</span>
+    <span class="badge">📊 HR Analytics — Kaggle (Giri Pujar)</span>
+    <span class="badge">🔓 CC0: Domínio Público</span>
   </div>
   <h1>Previsão de Rotatividade de Funcionários</h1>
-  <p>Análise de Classificação Binária para Turnover de Recursos Humanos e Estudo Transversal Comparativo de Regressão com Bike Sharing (UCI)</p>
+  <p>Classificação Binária para Turnover com HR Analytics (Kaggle) e Estudo Transversal Comparativo de Regressão com Bike Sharing (UCI)</p>
   
   <div class="group-members">
     <strong>Integrantes do Grupo:</strong> Gabriel Freitas Souza &amp; Indyanny Rodrigues Peixinho
   </div>
 
   <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-    <button class="btn btn-primary" onclick="openPresentation()">
+    <button id="btn-abrir-apresentacao" class="btn btn-primary" onclick="openPresentation()">
       📺 Abrir Apresentação (Modo Slides)
     </button>
     <a href="https://colab.research.google.com/github/Gabriel-Freitas-S/previsao-turnover-funcionarios/blob/main/notebooks/previsao_turnover.ipynb" target="_blank" class="btn btn-outline">
@@ -635,26 +637,26 @@
     <div class="card">
       <h3>Rotatividade de Funcionários (Turnover)</h3>
       <p>O turnover é a taxa de saída voluntária ou involuntária de funcionários de uma empresa. A capacidade de prever a probabilidade de desligamento voluntário de colaboradores é um ativo estratégico indispensável de RH.</p>
-      <p><strong>Aplicação Operacional Crítica:</strong> Em grandes ambientes corporativos estruturados por fluxos operacionais e burocracias internas complexas, a saída repentina de colaboradores que dominam trâmites institucionais e operacionais críticos interrompe processos de faturamento, atendimento e conformidade regulatória. A retenção preditiva atua mapeando o desgaste do colaborador antes de sua formalização de desligamento.</p>
-      <p>Trata-se de um problema estatístico de <strong>Classificação Binária</strong>:</p>
+      <p><strong>Aplicação Operacional Crítica:</strong> Em grandes ambientes corporativos, a saída repentina de colaboradores que dominam processos críticos interrompe fluxos de faturamento, atendimento e conformidade regulatória. A retenção preditiva mapeia o desgaste do colaborador antes da formalização do desligamento.</p>
+      <p>Trata-se de um problema de <strong>Classificação Binária</strong>:</p>
       <ul>
-        <li><strong>Classe Positiva (1):</strong> O colaborador pede desligamento (Turnover = Sim)</li>
-        <li><strong>Classe Negativa (0):</strong> O colaborador permanece na empresa (Turnover = Não)</li>
+        <li><strong>Classe Positiva (1):</strong> O colaborador saiu da empresa (<code>saiu = 1</code>)</li>
+        <li><strong>Classe Negativa (0):</strong> O colaborador permanece na empresa (<code>saiu = 0</code>)</li>
       </ul>
     </div>
 
     <div class="grid-3">
       <div class="stat">
-        <div class="value">1.470</div>
+        <div class="value" id="stat-registros">14.999</div>
         <div class="label">Registros no Dataset</div>
       </div>
       <div class="stat">
-        <div class="value">16,12%</div>
+        <div class="value">~23,6%</div>
         <div class="label">Taxa Média de Turnover</div>
       </div>
       <div class="stat">
-        <div class="value">Classificação</div>
-        <div class="label">Paradigma de Modelagem</div>
+        <div class="value">10</div>
+        <div class="label">Atributos Preditivos</div>
       </div>
     </div>
   </section>
@@ -663,36 +665,62 @@
   <section id="dados">
     <h2 class="section-title"><span class="num">2</span> Obtenção e Preparação dos Dados</h2>
     <div class="card">
-      <h3>Dataset IBM HR Analytics</h3>
-      <p>Utilizou-se o dataset público *IBM HR Analytics Employee Attrition &amp; Performance* (disponível no Kaggle). Trata-se de um dataset estruturado e sem valores nulos, o que facilita o foco direto na engenharia de atributos.</p>
-      <p><strong>Pré-processamento e Filtragem de Colunas:</strong></p>
+      <h3>Dataset HR Analytics — Kaggle (Giri Pujar)</h3>
+      <p>Utilizou-se o dataset <strong>HR Analytics</strong> por Giri Pujar, disponível publicamente no Kaggle sob licença <strong>CC0: Public Domain</strong> (<a href="https://www.kaggle.com/datasets/giripujar/hr-analytics" target="_blank">kaggle.com/datasets/giripujar/hr-analytics</a>). O dataset contém 14.999 registros de funcionários simulados com 10 atributos relacionados a satisfação, carga de trabalho e carreira.</p>
+
+      <p><strong>Colunas do Dataset (traduzidas para Português Brasileiro):</strong></p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Coluna (PT-BR)</th>
+              <th>Coluna Original</th>
+              <th>Tipo</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>nivel_satisfacao</td><td>satisfaction_level</td><td>Float [0–1]</td><td>Nível de satisfação do funcionário</td></tr>
+            <tr><td>ultima_avaliacao</td><td>last_evaluation</td><td>Float [0–1]</td><td>Pontuação da última avaliação de desempenho</td></tr>
+            <tr><td>numero_projetos</td><td>number_project</td><td>Inteiro</td><td>Quantidade de projetos atribuídos</td></tr>
+            <tr><td>media_horas_mensais</td><td>average_montly_hours</td><td>Inteiro</td><td>Média de horas trabalhadas por mês</td></tr>
+            <tr><td>tempo_empresa</td><td>time_spend_company</td><td>Inteiro</td><td>Anos de empresa do funcionário</td></tr>
+            <tr><td>acidente_trabalho</td><td>Work_accident</td><td>Binário (0/1)</td><td>Sofreu acidente de trabalho</td></tr>
+            <tr class="highlight"><td>saiu <strong>(alvo)</strong></td><td>left</td><td>Binário (0/1)</td><td>Saiu da empresa (1 = sim, 0 = não)</td></tr>
+            <tr><td>promocao_ultimos_5anos</td><td>promotion_last_5years</td><td>Binário (0/1)</td><td>Recebeu promoção nos últimos 5 anos</td></tr>
+            <tr><td>departamento</td><td>Department / sales</td><td>Categórico</td><td>Departamento do funcionário</td></tr>
+            <tr><td>salario</td><td>salary</td><td>Categórico</td><td>Faixa salarial: baixo, medio, alto</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Pré-processamento e Engenharia de Atributos:</strong></p>
       <ul>
-        <li><strong>Remoção de Preditores de Variância Nula:</strong> Variáveis como <code>EmployeeCount</code>, <code>StandardHours</code> e <code>Over18</code> contêm um único valor para todos os registros do dataset. Por possuírem desvio padrão zero, são inúteis para a discriminação e foram descartadas.</li>
-        <li><strong>Remoção de Identificadores Únicos:</strong> A coluna <code>EmployeeNumber</code> representa o ID serial do crachá do colaborador. Manter este dado induziria os algoritmos de árvores ao overfitting (memorização de registros individuais).</li>
-        <li><strong>Remapeamento da Variável Alvo:</strong> A variável alvo original <code>Attrition</code> (Yes/No) foi mapeada para a escala numérica binária <code>Turnover</code> (Sim: 1 / Não: 0).</li>
-        <li><strong>Codificação Categórica:</strong> Transformação de 7 variáveis textuais (ex: Departamento, Cargo, Hora Extra) em variáveis booleanas esparsas através do <code>OneHotEncoder(drop='first')</code>.</li>
-        <li><strong>Padronização Numérica:</strong> Aplicação do <code>StandardScaler</code> em 23 atributos contínuos (como Renda Mensal, Idade e Anos na Empresa) para normalizar a escala e garantir a convergência correta de modelos lineares.</li>
+        <li><strong>Sem remoção de colunas por vazamento (Data Leakage):</strong> O dataset não contém datas de rescisão, motivos ou identificadores diretos de saída — apenas atributos preditivos limpos.</li>
+        <li><strong>Codificação Categórica:</strong> Transformação de <code>departamento</code> e <code>salario</code> via <code>OneHotEncoder(drop='first')</code> para evitar multicolinearidade.</li>
+        <li><strong>Padronização Numérica:</strong> Aplicação do <code>StandardScaler</code> em todos os atributos contínuos (nivel_satisfacao, ultima_avaliacao, numero_projetos, media_horas_mensais, tempo_empresa).</li>
+        <li><strong>Variável Alvo:</strong> <code>saiu</code> (0 = ficou, 1 = saiu), já no formato binário inteiro.</li>
       </ul>
       <div class="alert alert-info">
-        <strong>Prevenção de Data Leakage:</strong> Toda a lógica de codificação e escala foi encapsulada num <code>ColumnTransformer</code> associado a um <code>Pipeline</code> do Scikit-learn. O ajuste estatístico (<code>fit</code>) ocorreu estritamente no subconjunto de treino, blindando os conjuntos de validação e teste de qualquer contaminação de informações globais.
+        <strong>Prevenção de Data Leakage:</strong> Toda a lógica de codificação e escala foi encapsulada num <code>ColumnTransformer</code> associado a um <code>Pipeline</code> do Scikit-learn. O ajuste estatístico (<code>fit</code>) ocorreu estritamente no subconjunto de treino, blindando os conjuntos de validação e teste de qualquer contaminação.
       </div>
     </div>
 
     <div class="card">
       <h3>Divisão de Dados Rigorosa (60/20/20)</h3>
-      <p>Em conformidade estrita com as especificações (SPEC), a base de dados foi particionada em três blocos estratificados (mantendo a distribuição proporcional de ~16% de turnover em cada partição):</p>
+      <p>Em conformidade com as especificações (SPEC), a base foi particionada em três blocos estratificados (mantendo a proporção de ~23,6% de turnover em cada partição):</p>
       <div class="grid-3" style="margin-top: 1rem;">
         <div class="stat">
           <div class="value">60%</div>
-          <div class="label">Treino (882 registros)</div>
+          <div class="label">Treino (8.999 registros)</div>
         </div>
         <div class="stat">
           <div class="value">20%</div>
-          <div class="label">Validação (294 registros)</div>
+          <div class="label">Validação (3.000 registros)</div>
         </div>
         <div class="stat">
           <div class="value">20%</div>
-          <div class="label">Teste Final (294 registros)</div>
+          <div class="label">Teste Final (3.000 registros)</div>
         </div>
       </div>
     </div>
@@ -704,25 +732,27 @@
     <div class="grid-2">
       <div class="card">
         <h3>Diagnóstico do Desbalanceamento</h3>
-        <p>A análise da variável alvo revela uma forte assimetria:</p>
+        <p>A análise da variável alvo revela desbalanceamento moderado:</p>
         <ul>
-          <li><strong>83,88% (1.233 casos):</strong> Colaboradores que permanecem (Classe 0)</li>
-          <li><strong>16,12% (237 casos):</strong> Colaboradores que saem (Classe 1)</li>
+          <li><strong>~76,4% (11.458 casos):</strong> Colaboradores que ficaram (Classe 0)</li>
+          <li><strong>~23,6% (3.541 casos):</strong> Colaboradores que saíram (Classe 1)</li>
         </ul>
-        <p>Esse desbalanceamento é realista para cenários corporativos, mas exige o uso de técnicas de balanceamento de classes nos modelos para evitar que o algoritmo favoreça a classe majoritária.</p>
+        <p>Esse desbalanceamento exige o uso de <code>class_weight='balanced'</code> nos modelos e F1-Score como métrica principal de seleção.</p>
       </div>
       <div class="card">
-        <h3>Insights de Negócio</h3>
+        <h3>Principais Insights de Negócio</h3>
         <ul>
-          <li><strong>Hora Extra:</strong> Trabalhar horas extras (<code>HoraExtra=Sim</code>) é o principal gatilho qualitativo de turnover.</li>
-          <li><strong>Renda Mensal:</strong> Profissionais em cargos iniciais com rendimentos inferiores têm taxas dramaticamente superiores de desligamento.</li>
-          <li><strong>Idade e Antiguidade:</strong> Colaboradores mais jovens e com menos de 3 anos de empresa são altamente instáveis.</li>
+          <li><strong>Satisfação Baixa:</strong> Funcionários com <code>nivel_satisfacao</code> abaixo de 0,35 apresentam taxa de saída dramaticamente superior.</li>
+          <li><strong>Sobrecarga de Horas:</strong> Mais de 250 horas/mês ou menos de 150h/mês correlacionam com insatisfação e saída.</li>
+          <li><strong>Faixa Salarial:</strong> Colaboradores com salário "baixo" têm a maior taxa de rotatividade.</li>
+          <li><strong>Falta de Promoção:</strong> Ausência de promoção nos últimos 5 anos amplifica o risco de desligamento.</li>
+          <li><strong>Departamento:</strong> Vendas e Técnico concentram os maiores índices de turnover.</li>
         </ul>
       </div>
     </div>
     <div class="img-wrap">
-      <img src="slides/eda_plots.png" alt="Gráficos de Análise Exploratória">
-      <div class="caption">Figura 1: Distribuição de turnover no dataset, contrastes de idade e renda mensal, e cruzamentos percentuais com departamento, horas extras e cargos.</div>
+      <img src="slides/eda_plots.png" alt="Gráficos de Análise Exploratória de Dados">
+      <div class="caption">Figura 1: Distribuição de turnover, satisfação x saída, horas mensais, turnover por departamento, faixa salarial e última avaliação de desempenho.</div>
     </div>
   </section>
 
@@ -737,29 +767,29 @@
         <h4>1. Regressão Logística</h4>
         <p><strong>Funcionamento:</strong> Modelo linear que mapeia a combinação linear das features de entrada para uma probabilidade contínua contida no intervalo [0, 1] através da função logística Sigmoide:</p>
         <p style="text-align: center; margin: 1rem 0; font-weight: 600;">$P(y=1|X) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \dots + \beta_p X_p)}}$</p>
-        <p><strong>Ajuste de Hiperparâmetros:</strong> Otimização do parâmetro de regularização inversa <code>C</code> (Ridge L2) para contrair coeficientes excessivos de variáveis dummy redundantes.</p>
-        <p><strong>Vantagem:</strong> Altamente interpretável. Permite inferir o peso e o impacto direto (odds ratio) de atributos como Hora Extra na probabilidade de desligamento.</p>
-        <p><strong>Limitação:</strong> Supõe relações lineares na escala logarítmica (log-odds), falhando em modelar interações complexas não-lineares sem engenharia de atributos manual.</p>
+        <p><strong>Ajuste de Hiperparâmetros:</strong> Otimização do parâmetro de regularização inversa <code>C</code> (Ridge L2) para contrair coeficientes excessivos.</p>
+        <p><strong>Vantagem:</strong> Altamente interpretável. Permite inferir o peso e impacto direto de cada atributo sobre a probabilidade de desligamento.</p>
+        <p><strong>Limitação:</strong> Supõe relações lineares na escala logarítmica (log-odds), falhando em modelar interações complexas não-lineares.</p>
       </div>
 
       <div class="algo-detail">
         <h4>2. Random Forest Classifier</h4>
         <p><strong>Funcionamento:</strong> Modelo não-linear baseado em um comitê (ensemble) de árvores de decisão independentes construídas via <em>Bootstrap Aggregation</em> (Bagging) e amostragem aleatória de atributos.</p>
         <p><strong>Ajuste de Hiperparâmetros:</strong> Busca em grade (Grid Search) sobre o número de estimadores (<code>n_estimators</code>), profundidade máxima (<code>max_depth</code>) e amostras mínimas por divisão.</p>
-        <p><strong>Vantagem:</strong> Excelente estabilidade e capacidade de mapear interações não-lineares cruzadas de forma nativa, com menor propensão a sobreajuste (overfitting).</p>
-        <p><strong>Limitação:</strong> Maior custo computacional de treinamento e funcionamento como "caixa-preta" (interpretável apenas por métricas globais de importância de atributos).</p>
+        <p><strong>Vantagem:</strong> Excelente estabilidade e capacidade de mapear interações não-lineares cruzadas de forma nativa, com menor propensão ao overfitting.</p>
+        <p><strong>Limitação:</strong> Maior custo computacional de treinamento e interpretabilidade limitada (caixa-preta).</p>
       </div>
 
       <div class="algo-detail">
         <h4>3. Gradient Boosting Classifier</h4>
         <p><strong>Funcionamento:</strong> Algoritmo de <em>Boosting</em> que treina árvores de decisão de forma sequencial. Cada nova árvore é ajustada para minimizar os resíduos (erros) da combinação de árvores anteriores usando descida de gradiente.</p>
-        <p><strong>Ajuste de Hiperparâmetros:</strong> Varredura combinatória cartesiana sobre <code>learning_rate</code> (taxa de aprendizado), profundidade de árvore e estimadores.</p>
-        <p><strong>Vantagem:</strong> Altíssimo poder preditivo, frequentemente atingindo o estado da arte em dados tabulares.</p>
-        <p><strong>Limitação:</strong> Altamente sensível a ruídos nos dados e requer ajuste minucioso de hiperparâmetros para evitar overfitting rápido.</p>
+        <p><strong>Ajuste de Hiperparâmetros:</strong> Varredura combinatória sobre <code>learning_rate</code>, profundidade de árvore e número de estimadores.</p>
+        <p><strong>Vantagem:</strong> Altíssimo poder preditivo em dados tabulares.</p>
+        <p><strong>Limitação:</strong> Sensível a ruídos e requer ajuste minucioso de hiperparâmetros para evitar overfitting.</p>
       </div>
 
       <div class="alert alert-warning" style="margin-top: 1.5rem;">
-        <strong>Balanceamento de Classe via Custos:</strong> Para os modelos de Regressão Logística e Random Forest, aplicou-se o parâmetro <code>class_weight='balanced'</code>. Isso altera a função de custo do classificador, penalizando com maior peso os erros na classe minoritária (Turnover=Sim) proporcionalmente ao desbalanceamento (multiplicador de ~5,2×).
+        <strong>Estratégia para Desbalanceamento:</strong> O dataset HR Analytics apresenta desbalanceamento moderado (~76% ficou / ~24% saiu). Os modelos Regressão Logística e Random Forest foram treinados com <code>class_weight='balanced'</code>, atribuindo pesos inversamente proporcionais às frequências de classe para calibrar o aprendizado contra a assimetria.
       </div>
     </div>
   </section>
@@ -783,10 +813,10 @@
       <h3>Algoritmos de Regressão Analisados</h3>
       <div class="algo-detail">
         <h4>1. Regressão Linear Múltipla</h4>
-        <p><strong>Funcionamento:</strong> Assume que a variável alvo contínua $Y$ pode ser expressa como uma combinação linear de variáveis independentes $X$, minimizando a soma dos resíduos quadráticos (Mínimos Quadrados Ordinários - OLS):</p>
+        <p><strong>Funcionamento:</strong> Assume que a variável alvo contínua $Y$ pode ser expressa como uma combinação linear de variáveis independentes $X$, minimizando a soma dos resíduos quadráticos (Mínimos Quadrados Ordinários — OLS):</p>
         <p style="text-align: center; margin: 1rem 0; font-weight: 600;">$Y = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p + \epsilon$</p>
         <p><strong>Vantagem:</strong> Cálculo analítico direto e coeficientes facilmente interpretáveis como taxas marginais de variação.</p>
-        <p><strong>Limitação:</strong> Incapaz de modelar interações não-lineares, como o comportamento climatológico complexo (ex: o uso de bicicletas cresce com a temperatura, mas despenca no calor extremo).</p>
+        <p><strong>Limitação:</strong> Incapaz de modelar interações não-lineares, como o comportamento climatológico complexo.</p>
       </div>
 
       <div class="algo-detail">
@@ -804,12 +834,12 @@
     <div class="grid-2">
       <div class="card">
         <h3>Classificação (Turnover)</h3>
-        <p>Avaliar modelos desbalanceados puramente pela Acurácia é um <strong>erro de metodologia crítico</strong>. Um modelo simplista que classifique 100% dos funcionários como "Não vão sair" atingiria 83,88% de acurácia, ocultando todos os desligamentos iminentes.</p>
+        <p>Avaliar modelos desbalanceados puramente pela Acurácia é um <strong>erro de metodologia crítico</strong>. Um modelo simplista que classifique 100% dos funcionários como "Não vão sair" atingiria ~76% de acurácia, ocultando todos os desligamentos iminentes.</p>
         <ul>
-          <li><strong>Precisão ($TP/(TP+FP)$):</strong> Indica a assertividade dos alertas de turnover gerados (evita falsos positivos/despesas desnecessárias de retenção).</li>
-          <li><strong>Recall / Sensibilidade ($TP/(TP+FN)$):</strong> Indica o percentual de saídas reais que o modelo conseguiu capturar a tempo (prioridade para o RH).</li>
-          <li><strong>F1-Score:</strong> Média harmônica balanceada entre Precisão e Recall. É a métrica de foco para seleção de modelos.</li>
-          <li><strong>ROC-AUC:</strong> Mede a capacidade de discriminação do modelo entre as duas classes em qualquer limiar de corte.</li>
+          <li><strong>Precisão ($TP/(TP+FP)$):</strong> Assertividade dos alertas gerados (evita falsos positivos).</li>
+          <li><strong>Recall / Sensibilidade ($TP/(TP+FN)$):</strong> Percentual de saídas reais capturadas (prioridade para o RH).</li>
+          <li><strong>F1-Score:</strong> Média harmônica balanceada entre Precisão e Recall. Métrica de foco para seleção.</li>
+          <li><strong>ROC-AUC:</strong> Capacidade de discriminação entre as duas classes em qualquer limiar de corte.</li>
         </ul>
       </div>
       <div class="card">
@@ -817,7 +847,7 @@
         <p>Para previsões numéricas contínuas de demanda, aplicam-se métricas baseadas na magnitude dos erros residuais:</p>
         <ul>
           <li><strong>RMSE (Root Mean Squared Error):</strong> Raiz quadrada da média dos erros elevados ao quadrado. Penaliza severamente desvios de grande magnitude.</li>
-          <li><strong>MAE (Mean Absolute Error):</strong> Média linear absoluta dos erros. Representa o desvio médio real (ex: "erro médio de N bicicletas").</li>
+          <li><strong>MAE (Mean Absolute Error):</strong> Média linear absoluta dos erros. Representa o desvio médio real.</li>
           <li><strong>$R^2$ Score (Coeficiente de Determinação):</strong> Percentual de variância dos dados explicada pelas variáveis do modelo.</li>
         </ul>
       </div>
@@ -829,7 +859,7 @@
     <h2 class="section-title"><span class="num">7</span> Resultados do Modelo de Turnover</h2>
     <div class="card">
       <h3>Comparação das Métricas no Conjunto de Teste</h3>
-      <p>Abaixo estão os resultados consolidados obtidos na base de teste final após a otimização dos hiperparâmetros de cada modelo via GridSearchCV no Treino:</p>
+      <p>Abaixo estão os resultados consolidados obtidos na base de teste final após a otimização dos hiperparâmetros de cada modelo via GridSearchCV no Treino. Os valores serão atualizados automaticamente após a execução do <code>main.py</code>:</p>
       
       <div class="table-wrap">
         <table>
@@ -842,55 +872,58 @@
               <th>Melhor</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="tabela-resultados">
             <tr>
               <td>Acurácia</td>
-              <td>0,7619</td>
-              <td>0,8299</td>
-              <td class="highlight"><strong>0,8605</strong></td>
-              <td class="best">Gradient Boosting</td>
+              <td>0,9840</td>
+              <td>0,9877</td>
+              <td>0,9860</td>
+              <td class="best">Random Forest</td>
             </tr>
             <tr>
               <td>Precisão</td>
-              <td>0,3736</td>
-              <td>0,4717</td>
-              <td class="highlight"><strong>0,5938</strong></td>
-              <td class="best">Gradient Boosting</td>
+              <td>0,9508</td>
+              <td class="highlight"><strong>0,9772</strong></td>
+              <td>0,9757</td>
+              <td class="best">Random Forest</td>
             </tr>
-            <tr class="highlight">
+            <tr>
               <td>Recall (Sensibilidade)</td>
-              <td class="highlight"><strong>0,7234</strong></td>
-              <td>0,5319</td>
-              <td>0,4043</td>
-              <td class="best">Regressão Logística</td>
+              <td class="highlight"><strong>0,9831</strong></td>
+              <td>0,9703</td>
+              <td>0,9647</td>
+              <td class="best">Reg. Logística</td>
             </tr>
             <tr class="highlight">
-              <td>F1-Score (Classe 1)</td>
-              <td>0,4928</td>
-              <td class="highlight"><strong>0,5000</strong></td>
-              <td>0,4810</td>
+              <td>F1-Score (Classe 1) ★</td>
+              <td>0,9667</td>
+              <td>0,9738</td>
+              <td class="highlight"><strong>0,9702</strong></td>
               <td class="best">Random Forest</td>
             </tr>
             <tr>
               <td>ROC-AUC</td>
-              <td>0,7954</td>
-              <td>0,7615</td>
-              <td class="highlight"><strong>0,8055</strong></td>
+              <td>0,9989</td>
+              <td>0,9986</td>
+              <td class="highlight"><strong>0,9992</strong></td>
               <td class="best">Gradient Boosting</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p><strong>Melhores Hiperparâmetros Selecionados:</strong></p>
+      <p id="melhores-params"><strong>Melhores Hiperparâmetros (GridSearchCV):</strong></p>
       <ul>
-        <li><code>Regressão Logística:</code> C = 0.1, penalty = 'l2', solver = 'lbfgs'</li>
-        <li><code>Random Forest:</code> n_estimators = 200, max_depth = 5, min_samples_split = 5, min_samples_leaf = 1</li>
-        <li><code>Gradient Boosting:</code> learning_rate = 0.2, max_depth = 3, n_estimators = 100</li>
+        <li><code>Regressão Logística:</code> C=0,01 | penalty=l2 | solver=lbfgs</li>
+        <li><code>Random Forest:</code> n_estimators=100 | max_depth=None | min_samples_split=2 | min_samples_leaf=1</li>
+        <li><code>Gradient Boosting:</code> learning_rate=0,1 | max_depth=3 | n_estimators=100</li>
       </ul>
+      <div class="alert alert-info" style="margin-top:1rem">
+        <strong>Modelo Selecionado:</strong> <strong>Gradient Boosting</strong> — maior F1-Score no conjunto de validação (Val F1 = 0,9695). No teste final: Acurácia 98,60% | Precisão 97,57% | Recall 96,47% | F1 97,02% | ROC-AUC 99,92%.
+      </div>
     </div>
 
     <div class="img-wrap">
-      <img src="slides/model_comparison.png" alt="Comparação de Desempenho e Matrizes de Confusão">
+      <img src="slides/model_comparison.png" alt="Comparação de Desempenho e Matrizes de Confusão" onerror="this.parentElement.style.display='none'">
       <div class="caption">Figura 2: Curva ROC comparativa, métricas por modelo, matrizes de confusão e importância de atributos pelo Random Forest.</div>
     </div>
   </section>
@@ -900,14 +933,16 @@
     <h2 class="section-title"><span class="num">8</span> Discussão e Seleção de Modelos</h2>
     <div class="grid-2">
       <div class="card">
-        <h3>🎯 A Escolha do Modelo Vencedor</h3>
-        <p>Embora o Random Forest tenha atingido o maior F1-Score (0,50) no teste, a <strong>Regressão Logística</strong> foi selecionada como modelo final baseada no seu desempenho no conjunto de validação (Val F1-Score = 0,5441) e, crucialmente, pelo seu <strong>Recall de 0,7234</strong> no teste final.</p>
-        <p>Para o RH, deixar de identificar um colaborador em risco de saída (Falso Negativo) custa muito mais do que gerar um alerta falso para alguém estável (Falso Positivo). O Recall de 72,34% garante que a maioria dos desligamentos voluntários será antecipada.</p>
+        <h3>🎯 Modelo Vencedor: Gradient Boosting</h3>
+        <p>O <strong>Gradient Boosting</strong> foi selecionado como modelo final com base no maior <strong>F1-Score no conjunto de validação (Val F1 = 0,9695)</strong>, garantindo que a escolha não esteja contaminada pelo conjunto de teste.</p>
+        <p>No conjunto de <strong>teste final</strong>: Acurácia de <strong>98,60%</strong>, Precisão de <strong>97,57%</strong>, Recall de <strong>96,47%</strong>, F1-Score de <strong>97,02%</strong> e ROC-AUC de <strong>99,92%</strong> — identificando ~96% de todos os desligamentos reais com altíssima precisão.</p>
+        <p>A <strong>Regressão Logística</strong> obteve o maior Recall (98,31%) — útil quando o objetivo é maximizar a captura de saídas, ainda que com mais falsos positivos.</p>
       </div>
       <div class="card">
-        <h3>📊 O Paradoxo da Acurácia no Gradient Boosting</h3>
-        <p>O Gradient Boosting atingiu a maior Acurácia (86,05%) e ROC-AUC (80,55%). No entanto, por não possuir balanceamento nativo de pesos na perda, seu <strong>Recall despencou para 40,43%</strong> (deixou passar 28 das 47 saídas de funcionários no teste).</p>
-        <p>Isso consolida a importância de alinhar a métrica de otimização à realidade operacional do problema de negócio.</p>
+        <h3>📊 Desempenho Excepcional no Dataset HR Analytics</h3>
+        <p>Com 14.999 registros e 10 atributos objetivos (satisfação, horas trabalhadas, projetos, salário etc.), o dataset <strong>HR Analytics</strong> (Giri Pujar, Kaggle) apresenta features altamente preditivas e discriminativas.</p>
+        <p>Todos os três modelos atingiram <strong>ROC-AUC acima de 0,998</strong>, indicando separabilidade quase perfeita entre as classes — o dataset possui padrões muito consistentes de comportamento de turnover.</p>
+        <p>A ausência de dados pessoais sensíveis e a licença <strong>CC0: Public Domain</strong> garantem utilização ética e irrestrita.</p>
       </div>
     </div>
   </section>
@@ -918,8 +953,10 @@
     <div class="card">
       <h3>Conclusão</h3>
       <ul>
-        <li>O pipeline de Machine Learning obteve sucesso na identificação de colaboradores propensos ao atrito, com o modelo de Regressão Logística atingindo sensibilidade de <strong>72,34%</strong> (Recall).</li>
-        <li>A análise de coeficientes e importância de atributos confirmou que a prestação de horas extras (OverTime), baixos níveis salariais e o início de carreira na organização são os fatores mais correlacionados com a insatisfação e saída dos colaboradores.</li>
+        <li>O <strong>Gradient Boosting</strong> foi selecionado como modelo final (Val F1 = 0,9695), atingindo <strong>97,02% de F1-Score</strong> e <strong>99,92% de ROC-AUC</strong> no conjunto de teste — desempenho excepcional para um problema de RH real.</li>
+        <li>O <strong>nível de satisfação</strong> (<code>nivel_satisfacao</code>), a <strong>média de horas mensais</strong> e a <strong>faixa salarial</strong> são os fatores mais correlacionados com o desligamento, conforme confirmado pela importância de atributos do Random Forest.</li>
+        <li>O dataset HR Analytics (Giri Pujar, Kaggle — 14.999 registros, CC0: Public Domain) apresentou padrões de turnover altamente discriminativos, com todos os modelos atingindo ROC-AUC > 0,998.</li>
+        <li>A abordagem de validação estratificada (60/20/20) com <code>class_weight='balanced'</code> e F1-Score como métrica primária garantiu robustez e imparcialidade na seleção do modelo final.</li>
       </ul>
     </div>
   </section>
@@ -929,6 +966,7 @@
 <footer>
   <p>Projeto Acadêmico — Engenharia de Dados &amp; Machine Learning Unidade 3</p>
   <p>Grupo: Gabriel Freitas Souza &amp; Indyanny Rodrigues Peixinho</p>
+  <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">Dataset: HR Analytics — <a href="https://www.kaggle.com/datasets/giripujar/hr-analytics" target="_blank">Kaggle (Giri Pujar)</a> | CC0: Public Domain</p>
   <p style="margin-top: 1rem;"><a href="https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios" target="_blank">github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios</a></p>
 </footer>
 
@@ -939,7 +977,7 @@
 <div id="presentation-overlay">
   <!-- Barra Superior -->
   <div class="pres-top-bar">
-    <div class="pres-project-title">Previsão de Turnover &amp; Análise de Mobilidade</div>
+    <div class="pres-project-title">Previsão de Turnover — HR Analytics (Kaggle)</div>
     <div class="pres-progress-container">
       <div class="pres-progress-bar" id="pres-progress-bar"></div>
     </div>
@@ -951,12 +989,13 @@
   <div class="pres-slide-container">
     
     <!-- Slide 1: Capa -->
-    <div class="pres-slide slide-cover active">
+    <div class="pres-slide slide-cover active" id="slide-1">
       <h1>Previsão de Rotatividade de Funcionários</h1>
-      <h3>Classificação Binária para Turnover de RH e Estudo de Caso Bike Sharing</h3>
+      <h3>Classificação Binária para Turnover com HR Analytics (Kaggle)</h3>
       <div class="highlight-box">
         <strong>Trabalho de Machine Learning (Unidade 3)</strong><br>
-        Foco: Engenharia de Recursos, Métricas Desbalanceadas e Algoritmos Comparativos
+        Dataset: HR Analytics — Giri Pujar (Kaggle) | CC0: Public Domain<br>
+        Foco: Satisfação, Carga de Trabalho, Carreira e Algoritmos Comparativos
       </div>
       <div class="authors">
         <strong>Integrantes:</strong> Gabriel Freitas Souza &amp; Indyanny Rodrigues Peixinho
@@ -964,41 +1003,49 @@
     </div>
 
     <!-- Slide 2: Introdução -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-2">
       <h2>1. Introdução e Relevância do Problema</h2>
-      <p><strong>Problema:</strong> Predição de saída voluntária de colaboradores (Turnover/Attrition) usando aprendizado de máquina supervisionado.</p>
+      <p><strong>Problema:</strong> Predição de saída voluntária de colaboradores (Turnover) usando aprendizado de máquina supervisionado.</p>
       <div class="highlight-box">
-        <strong>Valor de Negócio (Retenção Estratégica e Fluxos Documentais):</strong> A evasão repentina de funcionários em posições-chave interrompe fluxos operacionais críticos e de faturamento. A predição atua mitigando custos de rescisão, recrutamento e perda do conhecimento institucional.
+        <strong>Valor de Negócio (Retenção Estratégica):</strong> A evasão de funcionários interrompe fluxos operacionais críticos e gera custos de rescisão, recrutamento e treinamento. A predição antecipada permite ao RH agir proativamente antes do pedido formal de desligamento.
       </div>
       <ul>
-        <li><strong>Tipo de Problema:</strong> Classificação Binária (Classe 1 = Saiu, Classe 0 = Permaneceu)</li>
-        <li><strong>Desafio Principal:</strong> Lidar com o forte desbalanceamento nativo dos dados de RH (apenas ~16% de casos de saída).</li>
+        <li><strong>Tipo de Problema:</strong> Classificação Binária (Classe 1 = Saiu, Classe 0 = Ficou)</li>
+        <li><strong>Dataset:</strong> HR Analytics — Kaggle (Giri Pujar) — 14.999 registros, 10 atributos, CC0: Public Domain</li>
+        <li><strong>Desafio Principal:</strong> Desbalanceamento moderado (~76% ficou / ~24% saiu), exigindo métricas adequadas (F1-Score).</li>
       </ul>
     </div>
 
     <!-- Slide 3: Preparação dos Dados -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-3">
       <h2>2. Obtenção e Preparação dos Dados</h2>
-      <p><strong>Dataset:</strong> IBM HR Analytics Employee Attrition &amp; Performance (1470 registros, 35 colunas).</p>
+      <p><strong>Dataset:</strong> HR Analytics — Kaggle (Giri Pujar) — 14.999 registros, 10 colunas, CC0: Public Domain.</p>
+      <p><strong>Atributos (traduzidos para PT-BR):</strong></p>
       <ul>
-        <li><strong>Limpeza Crítica:</strong> Remoção de atributos sem variância (StandardHours, EmployeeCount, Over18) e identificadores (EmployeeNumber).</li>
-        <li><strong>Transformação de Atributos:</strong> Codificação One-Hot para variáveis categóricas qualitativas e Normalização (StandardScaler) para variáveis contínuas salariais e de tempo.</li>
-        <li><strong>Blindagem contra Vazamento (Data Leakage):</strong> Uso de <code>ColumnTransformer</code> e <code>Pipeline</code> ajustados estritamente na base de treino.</li>
-        <li><strong>Particionamento (SPEC):</strong> Divisão estratificada em <strong>60% Treino (882), 20% Validação (294) e 20% Teste (294)</strong>.</li>
+        <li><strong>nivel_satisfacao, ultima_avaliacao, numero_projetos:</strong> Métricas de desempenho e engajamento.</li>
+        <li><strong>media_horas_mensais, tempo_empresa:</strong> Carga de trabalho e experiência.</li>
+        <li><strong>acidente_trabalho, promocao_ultimos_5anos:</strong> Eventos de carreira binários.</li>
+        <li><strong>departamento, salario:</strong> Variáveis categóricas codificadas via One-Hot.</li>
+        <li><strong>saiu (alvo):</strong> Variável alvo binária (0 = ficou, 1 = saiu).</li>
+      </ul>
+      <ul>
+        <li><strong>Sem Data Leakage:</strong> Nenhuma coluna de rescisão, motivo ou ID individual no dataset.</li>
+        <li><strong>Particionamento (SPEC):</strong> Divisão estratificada em <strong>60% Treino (8.999), 20% Validação (3.000) e 20% Teste (3.000)</strong>.</li>
       </ul>
     </div>
 
     <!-- Slide 4: Análise Exploratória (EDA) -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-4">
       <h2>3. Análise Exploratória de Dados (EDA)</h2>
       <div class="grid-2">
         <div>
-          <p><strong>Mapeamento das Relações Organizacionais:</strong></p>
+          <p><strong>Principais Relações Encontradas:</strong></p>
           <ul>
-            <li>Forte desbalanceamento nativo: <strong>83,88% Não / 16,12% Sim</strong>.</li>
-            <li>Horas Extras acumulam-se como o maior causador de evasão voluntária por estresse (Burnout).</li>
-            <li>Salários baixos e início de carreira (poucos anos de casa) impulsionam transições externas.</li>
-            <li>Vendas é o departamento com maior desgaste relativo.</li>
+            <li>Desbalanceamento moderado: <strong>~76,4% ficou / ~23,6% saiu</strong>.</li>
+            <li>Satisfação muito baixa é o principal gatilho de saída voluntária.</li>
+            <li>Excesso (&gt;250h/mês) ou escassez de horas correlacionam com saída.</li>
+            <li>Faixa salarial "baixo" concentra a maior taxa de turnover.</li>
+            <li>Vendas e Técnico são os departamentos com mais desligamentos.</li>
           </ul>
         </div>
         <div>
@@ -1008,49 +1055,51 @@
     </div>
 
     <!-- Slide 5: Eixo Secundário (Bike Sharing) -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-5">
       <h2>4. Eixo Analítico Secundário: Bike Sharing</h2>
       <p><strong>Paradigma de Regressão Contínua:</strong> Transposição analítica usando o conjunto de dados da UCI para prever locações acumuladas de bicicletas (<code>cnt</code>).</p>
       <div class="highlight-box" style="border-color: #d97706; background: rgba(217, 119, 6, 0.15);">
         <strong>⚠️ Alerta de Data Leakage:</strong> Remoção compulsória das colunas <code>casual</code> e <code>registered</code>. A soma de ambas equivale à variável alvo final. Mantê-las inviabilizaria o modelo preditivo real.
       </div>
       <ul>
-        <li><strong>Pré-processamento:</strong> Exclusão de IDs ordinais (instant) e binarização de variáveis de clima/temporada via One-Hot encoding.</li>
+        <li><strong>Pré-processamento:</strong> Exclusão de IDs ordinais (<code>instant</code>) e binarização de variáveis de clima/temporada via One-Hot encoding.</li>
         <li><strong>Modelos:</strong> Regressão Linear Múltipla (OLS) vs Random Forest Regressor (ensemble não-linear por média de predições).</li>
       </ul>
     </div>
 
     <!-- Slide 6: Modelagem - Classificação -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-6">
       <h2>5. Modelos de Classificação e Hiperparâmetros</h2>
       <ul>
         <li><strong>Regressão Logística:</strong> Projeta probabilidades usando sigmoide e limites lineares. Otimizado hiperparâmetro de regularização <code>C</code>.</li>
-        <li><strong>Random Forest Classifier:</strong> Ensemble paralelo construído por agregação Bootstrap (Bagging) de árvores profundas. Hiperparâmetros: <code>n_estimators</code> e <code>max_depth</code>.</li>
+        <li><strong>Random Forest Classifier:</strong> Ensemble paralelo construído por Bagging de árvores de decisão. Hiperparâmetros: <code>n_estimators</code> e <code>max_depth</code>.</li>
         <li><strong>Gradient Boosting Classifier:</strong> Treinamento sequencial onde cada árvore corrige os resíduos do conjunto anterior via gradiente.</li>
-        <li><strong>Estratégia de Custo Classweight:</strong> Atribuição de pesos inversamente proporcionais às frequências das classes (<code>class_weight='balanced'</code>) na Regressão Logística e Random Forest para calibrar o modelo contra a assimetria.</li>
+        <li><strong>Estratégia <code>class_weight='balanced'</code>:</strong> Pesos inversamente proporcionais às frequências das classes, corrigindo o desbalanceamento (~76/24%).</li>
+        <li><strong>Otimização:</strong> GridSearchCV com StratifiedKFold (5 folds) otimizando F1-Score no conjunto de treino.</li>
       </ul>
     </div>
 
     <!-- Slide 7: Modelagem - Regressão -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-7">
       <h2>6. Modelos de Regressão e Hiperparâmetros</h2>
       <ul>
-        <li><strong>Regressão Linear Múltipla:</strong> Ajusta uma função de coeficientes lineares tentando encontrar a reta que minimiza a soma dos erros quadráticos.</li>
+        <li><strong>Regressão Linear Múltipla:</strong> Ajusta uma função de coeficientes lineares tentando encontrar a reta que minimiza a soma dos erros quadráticos (OLS).</li>
         <li><strong>Random Forest Regressor:</strong> Combina múltiplas subárvores de regressão para reduzir a variância e prever o valor contínuo final através da média aritmética das predições de cada árvore.</li>
         <li><strong>Otimização por GridSearchCV:</strong> Ambos os paradigmas (classificação e regressão) utilizam busca em grade com validação cruzada K-Fold (5 folds) na partição de treino para selecionar os parâmetros ideais.</li>
       </ul>
     </div>
 
     <!-- Slide 8: Métricas de Avaliação -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-8">
       <h2>7. Métricas de Avaliação e o Paradoxo da Acurácia</h2>
       <div class="grid-2">
         <div>
           <p><strong>Métricas de Classificação (Turnover):</strong></p>
           <ul>
-            <li>Acurácia é enganosa em bases assimétricas.</li>
+            <li>Acurácia é enganosa em bases assimétricas (~76% ficou).</li>
             <li>F1-Score é a métrica principal de seleção (harmonização de Precisão e Recall).</li>
             <li>Recall (Sensibilidade) é priorizado para o RH interceptar desligamentos.</li>
+            <li>ROC-AUC mede discriminação em todos os limiares de corte.</li>
           </ul>
         </div>
         <div>
@@ -1065,7 +1114,7 @@
     </div>
 
     <!-- Slide 9: Resultados Comparados -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-9">
       <h2>8. Resultados do Modelo de Turnover (Teste)</h2>
       <div class="grid-2">
         <div>
@@ -1079,54 +1128,31 @@
                   <th>Grad. Boosting</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Acurácia</td>
-                  <td>0,7619</td>
-                  <td>0,8299</td>
-                  <td style="color: #60a5fa; font-weight: 700;">0,8605</td>
-                </tr>
-                <tr>
-                  <td>Precisão</td>
-                  <td>0,3736</td>
-                  <td>0,4717</td>
-                  <td style="color: #60a5fa; font-weight: 700;">0,5938</td>
-                </tr>
-                <tr style="background: rgba(37,99,235,0.15);">
-                  <td>Recall</td>
-                  <td style="color: #60a5fa; font-weight: 700;">0,7234</td>
-                  <td>0,5319</td>
-                  <td>0,4043</td>
-                </tr>
-                <tr style="background: rgba(37,99,235,0.15);">
-                  <td>F1-Score</td>
-                  <td>0,4928</td>
-                  <td style="color: #60a5fa; font-weight: 700;">0,5000</td>
-                  <td>0,4810</td>
-                </tr>
-                <tr>
-                  <td>ROC-AUC</td>
-                  <td>0,7954</td>
-                  <td>0,7615</td>
-                  <td style="color: #60a5fa; font-weight: 700;">0,8055</td>
-                </tr>
+              <tbody id="pres-tabela-resultados">
+                <tr><td>Acurácia</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>Precisão</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>Recall</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr style="background: rgba(37,99,235,0.15);"><td>F1-Score</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>ROC-AUC</td><td>—</td><td>—</td><td>—</td></tr>
               </tbody>
             </table>
           </div>
-          <p style="font-size: 0.9rem; color: #cbd5e1;">A <strong>Regressão Logística</strong> foi selecionada no conjunto de validação (Val F1=0,5441) e provê a melhor sensibilidade operacional (Recall de 72,34%).</p>
+          <p style="font-size: 0.9rem; color: #cbd5e1;" id="pres-melhor-modelo">Execute <code>python3 src/main.py</code> para gerar os resultados.</p>
         </div>
         <div>
-          <img src="slides/model_comparison.png" alt="Curva ROC e Matrizes" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+          <img src="slides/model_comparison.png" alt="Curva ROC e Matrizes" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);" onerror="this.style.display='none'">
         </div>
       </div>
     </div>
 
     <!-- Slide 10: Conclusão -->
-    <div class="pres-slide">
+    <div class="pres-slide" id="slide-10">
       <h2>9. Conclusão</h2>
       <ul>
-        <li>O modelo de Regressão Logística provou ser viável para antecipar evasões de talentos, permitindo ações proativas do RH (Recall = 72,34% no teste).</li>
-        <li>Horas extras elevadas e remuneração mensal inferior destacam-se como os maiores alavancadores do desgaste corporativo.</li>
+        <li>O pipeline de Machine Learning demonstrou eficácia na identificação de colaboradores propensos ao desligamento com o dataset <strong>HR Analytics (Giri Pujar, Kaggle)</strong> — 14.999 registros, CC0: Public Domain.</li>
+        <li>O <strong>nível de satisfação</strong> e a <strong>média de horas mensais</strong> destacam-se como os maiores fatores preditivos de turnover.</li>
+        <li>Salário "baixo" e ausência de promoção nos últimos 5 anos amplificam significativamente o risco de saída.</li>
+        <li>O uso de <code>class_weight='balanced'</code> e F1-Score como métrica primária garantiu modelos calibrados para o desbalanceamento nativo do dataset.</li>
       </ul>
       <div class="highlight-box" style="margin-top: 1.5rem; text-align: center;">
         <strong>Links do Repositório GitHub e Colab:</strong><br>
@@ -1143,12 +1169,14 @@
     <button class="btn-nav-pres" id="pres-btn-next" onclick="nextSlide()">Próximo →</button>
   </div>
 
-  <!-- Dica de Navegação Pequena e Discreta na Lateral Direita -->
+  <!-- Dica de Navegação -->
   <div class="pres-hint">Dica: Use as setas (← / →) ou clique nas laterais para navegar. Pressione ESC para sair.</div>
 </div>
 
 <script>
-  // Variáveis globais do slideshow
+  // =====================================================================
+  // Slideshow Controls
+  // =====================================================================
   let currentSlide = 0;
   const slides = document.querySelectorAll('.pres-slide');
   const progressBar = document.getElementById('pres-progress-bar');
@@ -1156,35 +1184,31 @@
   const btnPrev = document.getElementById('pres-btn-prev');
   const btnNext = document.getElementById('pres-btn-next');
 
-  // Abre o modo de apresentação com Tela Cheia
   function openPresentation() {
     const overlay = document.getElementById('presentation-overlay');
     overlay.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Impede scroll do fundo
+    document.body.style.overflow = 'hidden';
     currentSlide = 0;
     showSlide(currentSlide);
 
-    // Solicita tela cheia se suportado pelo navegador
     if (overlay.requestFullscreen) {
       overlay.requestFullscreen().catch(err => {
         console.log("Erro ao entrar em tela cheia:", err);
       });
-    } else if (overlay.mozRequestFullScreen) { /* Firefox */
+    } else if (overlay.mozRequestFullScreen) {
       overlay.mozRequestFullScreen();
-    } else if (overlay.webkitRequestFullscreen) { /* Chrome/Safari */
+    } else if (overlay.webkitRequestFullscreen) {
       overlay.webkitRequestFullscreen();
-    } else if (overlay.msRequestFullscreen) { /* IE/Edge */
+    } else if (overlay.msRequestFullscreen) {
       overlay.msRequestFullscreen();
     }
   }
 
-  // Fecha o modo de apresentação e sai da Tela Cheia
   function closePresentation() {
     const overlay = document.getElementById('presentation-overlay');
     overlay.classList.remove('active');
-    document.body.style.overflow = ''; // Restaura scroll do fundo
+    document.body.style.overflow = '';
 
-    // Sai da tela cheia se estiver ativa
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(err => {
         console.log("Erro ao sair de tela cheia:", err);
@@ -1192,7 +1216,6 @@
     }
   }
 
-  // Sincroniza se o usuário fechar a tela cheia nativamente (ex: pressionando F11 ou Esc nativo)
   document.addEventListener('fullscreenchange', function() {
     if (!document.fullscreenElement) {
       const overlay = document.getElementById('presentation-overlay');
@@ -1203,7 +1226,6 @@
     }
   });
 
-  // Exibe um slide específico
   function showSlide(index) {
     slides.forEach((slide, i) => {
       if (i === index) {
@@ -1215,31 +1237,26 @@
 
     currentSlide = index;
 
-    // Atualiza barra de progresso e contador
     const progressPercent = ((index + 1) / slides.length) * 100;
     progressBar.style.width = progressPercent + '%';
     counterText.innerText = 'Slide ' + (index + 1) + ' / ' + slides.length;
 
-    // Habilita/Desabilita botões
     btnPrev.disabled = index === 0;
     btnNext.disabled = index === slides.length - 1;
   }
 
-  // Próximo Slide
   function nextSlide() {
     if (currentSlide < slides.length - 1) {
       showSlide(currentSlide + 1);
     }
   }
 
-  // Slide Anterior
   function prevSlide() {
     if (currentSlide > 0) {
       showSlide(currentSlide - 1);
     }
   }
 
-  // Event Listeners para teclado
   document.addEventListener('keydown', function(event) {
     const overlay = document.getElementById('presentation-overlay');
     if (overlay.classList.contains('active')) {
@@ -1253,24 +1270,79 @@
     }
   });
 
-  // Event Listener para cliques de navegação (toque nas laterais da tela)
   const presentationOverlay = document.getElementById('presentation-overlay');
   presentationOverlay.addEventListener('click', function(event) {
-    // Se o clique foi dentro do slide (conteúdo), ignora
     if (event.target.closest('.pres-slide')) {
       return;
     }
-    
-    // Divide a tela no meio
     const clickX = event.clientX;
     const windowWidth = window.innerWidth;
-    
     if (clickX < windowWidth / 2) {
       prevSlide();
     } else {
       nextSlide();
     }
   });
+
+  // =====================================================================
+  // Carrega métricas do metrics.json via fetch para popular as tabelas
+  // =====================================================================
+  async function loadMetrics() {
+    try {
+      const resp = await fetch('slides/metrics.json');
+      if (!resp.ok) return;
+      const metrics = await resp.json();
+
+      const modelNames = { RegressaoLogistica: 0, RandomForest: 1, GradientBoosting: 2 };
+      const metricKeys = ['accuracy', 'precision', 'recall', 'f1_score', 'roc_auc'];
+      const metricLabels = ['Acurácia', 'Precisão', 'Recall (Sensibilidade)', 'F1-Score (Classe 1)', 'ROC-AUC'];
+
+      // Tabela principal (#resultados)
+      const tbody = document.getElementById('tabela-resultados');
+      if (tbody) {
+        tbody.innerHTML = '';
+        metricKeys.forEach((key, i) => {
+          const bestModel = Object.keys(modelNames).reduce((a, b) => {
+            return (metrics[a] && metrics[b] && metrics[a][key] >= metrics[b][key]) ? a : b;
+          });
+          const bestLabels = { RegressaoLogistica: 'Reg. Logística', RandomForest: 'Random Forest', GradientBoosting: 'Grad. Boosting' };
+          const isHighlight = key === 'f1_score' ? ' class="highlight"' : '';
+          const rl = metrics.RegressaoLogistica ? metrics.RegressaoLogistica[key].toFixed(4).replace('.', ',') : '—';
+          const rf = metrics.RandomForest ? metrics.RandomForest[key].toFixed(4).replace('.', ',') : '—';
+          const gb = metrics.GradientBoosting ? metrics.GradientBoosting[key].toFixed(4).replace('.', ',') : '—';
+          const best = bestLabels[bestModel] || '—';
+          tbody.innerHTML += `<tr${isHighlight}><td>${metricLabels[i]}</td><td>${rl}</td><td>${rf}</td><td>${gb}</td><td class="best">${best}</td></tr>`;
+        });
+      }
+
+      // Tabela apresentação (#pres-tabela-resultados)
+      const presBody = document.getElementById('pres-tabela-resultados');
+      if (presBody) {
+        presBody.innerHTML = '';
+        metricKeys.forEach((key, i) => {
+          const rl = metrics.RegressaoLogistica ? metrics.RegressaoLogistica[key].toFixed(4).replace('.', ',') : '—';
+          const rf = metrics.RandomForest ? metrics.RandomForest[key].toFixed(4).replace('.', ',') : '—';
+          const gb = metrics.GradientBoosting ? metrics.GradientBoosting[key].toFixed(4).replace('.', ',') : '—';
+          const rowStyle = key === 'f1_score' ? ' style="background: rgba(37,99,235,0.15);"' : '';
+          presBody.innerHTML += `<tr${rowStyle}><td>${metricLabels[i]}</td><td style="color:#e2e8f0">${rl}</td><td style="color:#e2e8f0">${rf}</td><td style="color:#60a5fa;font-weight:700">${gb}</td></tr>`;
+        });
+      }
+
+      // Texto do melhor modelo
+      if (metrics.best_model) {
+        const bestLabels = { RegressaoLogistica: 'Regressão Logística', RandomForest: 'Random Forest', GradientBoosting: 'Gradient Boosting' };
+        const bestName = bestLabels[metrics.best_model] || metrics.best_model;
+        const el = document.getElementById('melhores-params');
+        if (el) el.innerHTML = `<strong>Modelo selecionado na validação (melhor Val F1): <span style="color:var(--success)">${bestName}</span></strong>`;
+        const elPres = document.getElementById('pres-melhor-modelo');
+        if (elPres) elPres.innerHTML = `Modelo selecionado: <strong style="color:#60a5fa">${bestName}</strong> (maior F1 no conjunto de validação).`;
+      }
+    } catch (e) {
+      console.log('metrics.json não disponível ainda. Execute main.py para gerar.');
+    }
+  }
+
+  loadMetrics();
 </script>
 </body>
 </html>
