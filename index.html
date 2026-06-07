@@ -643,7 +643,7 @@
   .lightbox-overlay.active img {
     transform: scale(1);
   }
-  .img-card img, .img-wrap img, .pres-slide img {
+  .img-card img, .img-wrap img {
     cursor: zoom-in;
   }
 
@@ -1509,15 +1509,15 @@
                 </tr>
               </thead>
               <tbody id="pres-tabela-resultados">
-                <tr><td>Acurácia</td><td>—</td><td>—</td><td>—</td></tr>
-                <tr><td>Precisão</td><td>—</td><td>—</td><td>—</td></tr>
-                <tr><td>Recall</td><td>—</td><td>—</td><td>—</td></tr>
-                <tr style="background: rgba(37,99,235,0.15);"><td>F1-Score</td><td>—</td><td>—</td><td>—</td></tr>
-                <tr><td>ROC-AUC</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>Acurácia</td><td style="color:#e2e8f0">0,9840</td><td style="color:#e2e8f0">0,9877</td><td style="color:#60a5fa;font-weight:700">0,9860</td></tr>
+                <tr><td>Precisão</td><td style="color:#e2e8f0">0,9508</td><td style="color:#e2e8f0">0,9772</td><td style="color:#60a5fa;font-weight:700">0,9757</td></tr>
+                <tr><td>Recall</td><td style="color:#e2e8f0">0,9831</td><td style="color:#e2e8f0">0,9703</td><td style="color:#60a5fa;font-weight:700">0,9647</td></tr>
+                <tr style="background: rgba(37,99,235,0.15);"><td>F1-Score</td><td style="color:#e2e8f0">0,9667</td><td style="color:#e2e8f0">0,9738</td><td style="color:#60a5fa;font-weight:700">0,9702</td></tr>
+                <tr><td>ROC-AUC</td><td style="color:#e2e8f0">0,9989</td><td style="color:#e2e8f0">0,9986</td><td style="color:#60a5fa;font-weight:700">0,9992</td></tr>
               </tbody>
             </table>
           </div>
-          <p style="font-size: 0.9rem; color: #cbd5e1;" id="pres-melhor-modelo">Execute <code>python3 src/main.py</code> para gerar os resultados.</p>
+          <p style="font-size: 0.9rem; color: #cbd5e1;" id="pres-melhor-modelo">Modelo selecionado: <strong style="color:#60a5fa">Gradient Boosting</strong> (maior F1 no conjunto de validação).</p>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; align-content:start;">
           <img src="slides/comp_metricas.png" alt="Métricas" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
@@ -1923,7 +1923,7 @@ py_predict(${satisfacao}, ${avaliacao}, ${projetos}, ${horas}, ${tempo}, ${acide
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeLightbox();
   });
-  document.querySelectorAll('.img-card img, .img-wrap img, .pres-slide img').forEach(function(img) {
+  document.querySelectorAll('.img-card img, .img-wrap img').forEach(function(img) {
     img.addEventListener('click', function(e) {
       e.stopPropagation();
       openLightbox(this.getAttribute('src') || this.src);
