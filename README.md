@@ -67,37 +67,37 @@ A **Regressão Logística** foi o modelo selecionado como vencedor no conjunto d
 
 ### Pré-requisitos
 - Python 3.11+
-- Podman ou Docker
+- python3-venv
 
-### Com Podman (recomendado)
+### Ambiente Virtual (recomendado)
 
 ```bash
 # Clonar o repositório
 git clone https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios.git
 cd previsao-turnover-funcionarios
 
+# Criar e ativar o ambiente virtual
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Instalar dependências
+pip install -r requirements.txt
+
 # Executar o pipeline completo
-podman run --rm --userns=keep-id \
-  -v .:/workspaces/previsao-turnover-funcionarios \
-  -w /workspaces/previsao-turnover-funcionarios/src \
-  docker.io/jupyter/scipy-notebook \
-  python3 main.py
+python3 src/main.py
 
 # Gerar os slides
-podman run --rm --userns=keep-id \
-  -v .:/workspaces/previsao-turnover-funcionarios \
-  -w /workspaces/previsao-turnover-funcionarios/src \
-  docker.io/jupyter/scipy-notebook \
-  bash -c "pip install -q -r ../requirements.txt && python3 generate_slides.py"
+python3 src/generate_slides.py
 ```
-
 
 ### Jupyter Notebook
 
 ```bash
-podman run --rm --userns=keep-id -p 8888:8888 \
-  -v .:/workspaces/previsao-turnover-funcionarios \
-  docker.io/jupyter/scipy-notebook
+# Ativar o ambiente (se ainda não estiver ativo)
+source .venv/bin/activate
+
+# Iniciar o Jupyter Notebook
+python3 -m notebook
 ```
 
 Abra o notebook em `notebooks/previsao_turnover.ipynb`.
@@ -128,7 +128,6 @@ previsao-turnover-funcionarios/
 ## Tecnologias
 
 - **Python 3.14** — scikit-learn, pandas, matplotlib, seaborn, joblib
-- **Container** — jupyter/scipy-notebook via Podman
 - **Editor** — Zed
 - **Slides** — fpdf2 (PDF)
 
