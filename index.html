@@ -273,6 +273,25 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
   }
   .img-wrap img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .img-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+  .img-grid .img-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .img-grid .img-card img { width: 100%; height: auto; display: block; }
+  .img-grid .img-card .label {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+    border-top: 1px solid var(--border);
+    background: #f8fafc;
+    text-align: center;
+  }
+
   .img-wrap .caption {
     padding: 1rem;
     font-size: 0.85rem;
@@ -583,6 +602,7 @@
   @media (max-width: 768px) {
     .hero h1 { font-size: 2.25rem; }
     .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .img-grid { grid-template-columns: repeat(2, 1fr); }
     section { padding: 2.5rem 0; }
     .pres-slide { padding: 1.5rem; }
     .pres-slide h2 { font-size: 1.5rem; }
@@ -905,9 +925,31 @@
         </ul>
       </div>
     </div>
-    <div class="img-wrap">
-      <img src="slides/eda_plots.png" alt="Gráficos de Análise Exploratória de Dados">
-      <div class="caption">Figura 1: Distribuição de turnover, satisfação x saída, horas mensais, turnover por departamento, faixa salarial e última avaliação de desempenho.</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <img src="slides/eda_turnover_dist.png" alt="Distribuicao de Turnover">
+        <div class="label">Distribuição de Turnover</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/eda_satisfacao.png" alt="Satisfacao vs Turnover">
+        <div class="label">Satisfação vs Turnover</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/eda_horas.png" alt="Horas Mensais vs Turnover">
+        <div class="label">Horas Mensais vs Turnover</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/eda_dept.png" alt="Turnover por Departamento">
+        <div class="label">Turnover por Departamento (%)</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/eda_salario.png" alt="Salario vs Turnover">
+        <div class="label">Salário vs Turnover</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/eda_avaliacao.png" alt="Ultima Avaliacao vs Turnover">
+        <div class="label">Última Avaliação vs Turnover</div>
+      </div>
     </div>
   </section>
 
@@ -1077,9 +1119,31 @@
       </div>
     </div>
 
-    <div class="img-wrap">
-      <img src="slides/model_comparison.png" alt="Comparação de Desempenho e Matrizes de Confusão" onerror="this.parentElement.style.display='none'">
-      <div class="caption">Figura 2: Curva ROC comparativa, métricas por modelo, matrizes de confusão e importância de atributos pelo Random Forest.</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <img src="slides/comp_metricas.png" alt="Métricas de Desempenho">
+        <div class="label">Métricas de Desempenho</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/comp_roc.png" alt="Curva ROC">
+        <div class="label">Curva ROC</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/comp_features.png" alt="Importância dos Atributos">
+        <div class="label">Importância dos Atributos — Random Forest</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/cm_logistica.png" alt="Matriz de Confusão - Regressão Logística">
+        <div class="label">Matriz de Confusão — Reg. Logística</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/cm_rf.png" alt="Matriz de Confusão - Random Forest">
+        <div class="label">Matriz de Confusão — Random Forest</div>
+      </div>
+      <div class="img-card">
+        <img src="slides/cm_gb.png" alt="Matriz de Confusão - Gradient Boosting">
+        <div class="label">Matriz de Confusão — Gradient Boosting</div>
+      </div>
     </div>
   </section>
 
@@ -1304,8 +1368,11 @@
             <li>Vendas e Técnico são os departamentos com mais desligamentos.</li>
           </ul>
         </div>
-        <div>
-          <img src="slides/eda_plots.png" alt="Gráficos EDA" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <img src="slides/eda_turnover_dist.png" alt="Distribuição Turnover" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
+          <img src="slides/eda_satisfacao.png" alt="Satisfação vs Turnover" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
+          <img src="slides/eda_horas.png" alt="Horas vs Turnover" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
+          <img src="slides/eda_dept.png" alt="Turnover por Dept" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
         </div>
       </div>
     </div>
@@ -1395,8 +1462,11 @@
           </div>
           <p style="font-size: 0.9rem; color: #cbd5e1;" id="pres-melhor-modelo">Execute <code>python3 src/main.py</code> para gerar os resultados.</p>
         </div>
-        <div>
-          <img src="slides/model_comparison.png" alt="Curva ROC e Matrizes" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);" onerror="this.style.display='none'">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; align-content:start;">
+          <img src="slides/comp_metricas.png" alt="Métricas" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
+          <img src="slides/comp_roc.png" alt="Curva ROC" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
+          <img src="slides/cm_rf.png" alt="Matriz RF" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
+          <img src="slides/cm_gb.png" alt="Matriz GB" style="width:100%; border-radius:6px; border:1px solid rgba(255,255,255,0.15);">
         </div>
       </div>
     </div>

@@ -120,6 +120,75 @@ def plot_eda(df: pd.DataFrame) -> None:
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     print(f"Graficos EDA salvos em {output_path}")
 
+    slides_dir = os.path.join(BASE_DIR, "slides")
+    df_plot = df.copy()
+    df_plot["Rotatividade"] = df_plot["saiu"].map({0: "Nao", 1: "Sim"})
+
+    fig, ax = plt.subplots(figsize=(5, 3.5))
+    sns.countplot(data=df_plot, x="Rotatividade", hue="Rotatividade",
+                  ax=ax, legend=False, palette=["#4CAF50", "#F44336"])
+    ax.set_title("Distribuicao de Turnover")
+    ax.set_xlabel("")
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "eda_turnover_dist.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(5, 3.5))
+    sns.boxplot(data=df_plot, x="Rotatividade", y="nivel_satisfacao", hue="Rotatividade",
+                ax=ax, legend=False, palette=["#4CAF50", "#F44336"])
+    ax.set_title("Satisfacao vs Turnover")
+    ax.set_ylabel("Nivel de Satisfacao")
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "eda_satisfacao.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(5, 3.5))
+    sns.boxplot(data=df_plot, x="Rotatividade", y="media_horas_mensais", hue="Rotatividade",
+                ax=ax, legend=False, palette=["#4CAF50", "#F44336"])
+    ax.set_title("Horas Mensais vs Turnover")
+    ax.set_ylabel("Media de Horas Mensais")
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "eda_horas.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(5, 3.5))
+    att_by_dept = df_plot.groupby("departamento")["saiu"].value_counts(normalize=True).unstack() * 100
+    if 1 in att_by_dept.columns:
+        att_by_dept = att_by_dept[[1, 0]] if 0 in att_by_dept.columns else att_by_dept
+    else:
+        att_by_dept[1] = 0
+        att_by_dept[0] = 100 - att_by_dept[1]
+    att_by_dept = att_by_dept.sort_values(1, ascending=False)
+    att_by_dept.plot(kind="bar", stacked=True, ax=ax, color=["#F44336", "#4CAF50"])
+    ax.set_title("Turnover por Departamento (%)")
+    ax.set_ylabel("Percentual")
+    ax.legend(["Saiu", "Ficou"], title="Rotatividade")
+    ax.tick_params(axis="x", rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "eda_dept.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(5, 3.5))
+    sal_order = ["baixo", "medio", "alto"]
+    sns.countplot(data=df_plot, x="salario", hue="Rotatividade",
+                  ax=ax, order=sal_order, palette=["#4CAF50", "#F44336"])
+    ax.set_title("Salario vs Turnover")
+    ax.set_xlabel("Faixa Salarial")
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "eda_salario.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(5, 3.5))
+    sns.boxplot(data=df_plot, x="Rotatividade", y="ultima_avaliacao", hue="Rotatividade",
+                ax=ax, legend=False, palette=["#4CAF50", "#F44336"])
+    ax.set_title("Ultima Avaliacao vs Turnover")
+    ax.set_ylabel("Pontuacao da Ultima Avaliacao")
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "eda_avaliacao.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    print("Graficos EDA individuais salvos em slides/")
+
 
 def preprocess_data(df: pd.DataFrame):
     df_proc = df.copy()
@@ -320,6 +389,86 @@ def plot_results(results: list, y_test: pd.Series) -> None:
     output_path = os.path.join(BASE_DIR, "slides", "model_comparison.png")
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     print(f"Grafico salvo em {output_path}")
+
+    slides_dir = os.path.join(BASE_DIR, "slides")
+    model_names = {"RegressaoLogistica": "Regressao Logistica",
+                   "RandomForest": "Random Forest", "GradientBoosting": "Gradient Boosting"}
+
+    fig, ax = plt.subplots(figsize=(5.5, 4))
+    metrics_df.plot(kind="bar", ax=ax, rot=0, colormap="viridis")
+    ax.set_title("Metricas de Desempenho", fontsize=12, fontweight="bold")
+    ax.set_ylim(0, 1.05)
+    ax.legend(loc="lower left", fontsize=7)
+    ax.grid(axis="y", alpha=0.3)
+    ax.set_xlabel("")
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "comp_metricas.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(5.5, 4))
+    for r in results:
+        fpr, tpr, _ = roc_curve(y_test, r["y_proba"])
+        ax.plot(fpr, tpr, label=f"{model_names.get(r['model'], r['model'])} (AUC={r['roc_auc']:.3f})")
+    ax.plot([0, 1], [0, 1], "k--", alpha=0.3)
+    ax.set_title("Curva ROC", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Taxa de Falso Positivo")
+    ax.set_ylabel("Taxa de Verdadeiro Positivo")
+    ax.legend(fontsize=8)
+    ax.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(slides_dir, "comp_roc.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    fi_data = []
+    feature_names = None
+    for r in results:
+        if r["model"] == "RandomForest":
+            fi = r.get("feature_importances")
+            feature_names = r.get("feature_names")
+            if fi is not None:
+                fi_data.append((r["model"], fi))
+
+    if fi_data:
+        _, fi = fi_data[0]
+        n_top = min(10, len(fi))
+        fi_sorted = fi.argsort()[-n_top:][::-1]
+        fig, ax = plt.subplots(figsize=(5.5, 4))
+        if feature_names is not None:
+            cleaned_names = [str(feature_names[idx]).replace("cat__", "").replace("num__", "") for idx in fi_sorted]
+            ax.barh(range(n_top), fi[fi_sorted], color="steelblue")
+            ax.set_yticks(range(n_top))
+            ax.set_yticklabels(cleaned_names, fontsize=8)
+        else:
+            ax.barh(range(n_top), fi[fi_sorted], color="steelblue")
+            ax.set_yticks(range(n_top))
+            ax.set_yticklabels(range(n_top))
+        ax.set_title(f"Top {n_top} Atributos — Random Forest", fontsize=12, fontweight="bold")
+        ax.invert_yaxis()
+        plt.tight_layout()
+        plt.savefig(os.path.join(slides_dir, "comp_features.png"), dpi=150, bbox_inches="tight")
+        plt.close()
+
+    cm_names = [("RegressaoLogistica", "cm_logistica.png"),
+                ("RandomForest", "cm_rf.png"),
+                ("GradientBoosting", "cm_gb.png")]
+    for model_key, fname in cm_names:
+        for r in results:
+            if r["model"] == model_key:
+                fig, ax = plt.subplots(figsize=(4, 3.5))
+                sns.heatmap(r["confusion_matrix"], annot=True, fmt="d",
+                            cmap="Blues", ax=ax, cbar=False)
+                ax.set_title(f"Matriz de Confusao\n{model_names.get(model_key, model_key)}",
+                             fontsize=11, fontweight="bold")
+                ax.set_xlabel("Previsto")
+                ax.set_ylabel("Real")
+                ax.set_xticklabels(["Ficou", "Saiu"])
+                ax.set_yticklabels(["Ficou", "Saiu"])
+                plt.tight_layout()
+                plt.savefig(os.path.join(slides_dir, fname), dpi=150, bbox_inches="tight")
+                plt.close()
+                break
+
+    print("Graficos comparativos individuais salvos em slides/")
 
 
 def main():
