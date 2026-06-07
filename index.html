@@ -647,6 +647,27 @@
     cursor: zoom-in;
   }
 
+  .img-card { position: relative; }
+  .img-card::after {
+    content: "🔍";
+    position: absolute;
+    top: 8px; right: 8px;
+    font-size: 1.1rem;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .img-card:hover::after {
+    opacity: 1;
+  }
+
   /* === Preditor de Turnover === */
   .pred-form { margin-bottom: 1.5rem; }
   .pred-form label {
@@ -1884,7 +1905,7 @@ py_predict(${satisfacao}, ${avaliacao}, ${projetos}, ${horas}, ${tempo}, ${acide
 
 <!-- Lightbox -->
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
-  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  <img id="lightbox-img" src="" alt="" onclick="closeLightbox()">
 </div>
 
 <script>
