@@ -91,16 +91,6 @@ podman run --rm --userns=keep-id \
   bash -c "pip install -q -r ../requirements.txt && python3 generate_slides.py"
 ```
 
-### Com Dev Container (Zed)
-
-1. Abra a pasta do projeto no [Zed Editor](https://zed.dev)
-2. Aceite "Reopen in Container" quando solicitado
-3. No terminal do container:
-
-```bash
-python3 src/main.py
-pip install -q -r requirements.txt && python3 src/generate_slides.py
-```
 
 ### Jupyter Notebook
 
@@ -116,8 +106,6 @@ Abra o notebook em `notebooks/previsao_turnover.ipynb`.
 
 ```
 previsao-turnover-funcionarios/
-├── .devcontainer/
-│   └── devcontainer.json      # Configuração do Dev Container (Podman)
 ├── data/
 │   └── HR_Employee_Attrition.csv  # Dataset IBM HR
 ├── notebooks/
@@ -141,7 +129,7 @@ previsao-turnover-funcionarios/
 
 - **Python 3.14** — scikit-learn, pandas, matplotlib, seaborn, joblib
 - **Container** — jupyter/scipy-notebook via Podman
-- **Editor** — Zed com Dev Containers
+- **Editor** — Zed
 - **Slides** — fpdf2 (PDF)
 
 ## Licença
