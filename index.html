@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <style>
   :root {
     --primary: #0f172a;
@@ -585,6 +586,155 @@
     .slide-cover h1 { font-size: 2.25rem; }
     .slide-cover h3 { font-size: 1.1rem; }
   }
+
+  /* === Preditor de Turnover === */
+  .pred-form { margin-bottom: 1.5rem; }
+  .pred-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-light);
+    gap: 0.35rem;
+  }
+  .pred-form .valor-slider {
+    font-weight: 400;
+    color: var(--accent);
+    font-size: 0.95rem;
+  }
+  .pred-form input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  .pred-form input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    transition: transform 0.15s;
+  }
+  .pred-form input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  .pred-form input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .pred-form select {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .pred-form select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+  }
+  .pred-botoes {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .pred-result {
+    display: none;
+    margin-top: 2rem;
+    text-align: center;
+  }
+  .pred-result.ativo { display: block; }
+  .pred-prob {
+    font-size: 2.5rem;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
+    margin-bottom: 0.25rem;
+  }
+  .pred-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .risk-badge {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.75rem 2rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .risk-baixo  { background: #dcfce7; color: #166534; }
+  .risk-medio  { background: #fef9c3; color: #854d0e; }
+  .risk-alto   { background: #fee2e2; color: #991b1b; }
+  .pred-features-list {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    justify-content: center;
+  }
+  .pred-features-list span {
+    background: #f1f5f9;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+  }
+  .pred-erro {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: var(--danger);
+    font-size: 0.9rem;
+  }
+  .pred-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .pred-loading .spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #bfdbfe;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pred-loading.pronto .spinner { display: none; }
+  .pred-loading.pronto { background: #dcfce7; border-color: #86efac; color: #166534; }
 </style>
 </head>
 <body>
@@ -627,6 +777,7 @@
   <a href="#resultados">Resultados</a>
   <a href="#discussao">Discussão</a>
   <a href="#conclusao">Conclusão</a>
+  <a href="#predictor">Preditor</a>
 </nav>
 
 <div class="container">
@@ -958,6 +1109,107 @@
         <li>O dataset HR Analytics (Giri Pujar, Kaggle — 14.999 registros, CC0: Public Domain) apresentou padrões de turnover altamente discriminativos, com todos os modelos atingindo ROC-AUC > 0,998.</li>
         <li>A abordagem de validação estratificada (60/20/20) com <code>class_weight='balanced'</code> e F1-Score como métrica primária garantiu robustez e imparcialidade na seleção do modelo final.</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- 10. Preditor de Turnover -->
+  <section id="predictor">
+    <h2 class="section-title"><span class="num">10</span> Preditor de Turnover</h2>
+    <div class="card">
+      <p>Ajuste os dados do funcionário abaixo e clique em <strong>Prever Risco</strong> para simular a predição do modelo Gradient Boosting.</p>
+
+      <div class="pred-form">
+        <div class="grid-3">
+          <label>
+            Nível de Satisfação <span class="valor-slider" id="val-satisfacao">0,63</span>
+            <input type="range" min="0" max="1" step="0.01" id="nivel_satisfacao" value="0.63"
+                   oninput="atualizarSlider('nivel_satisfacao','val-satisfacao')">
+          </label>
+          <label>
+            Última Avaliação <span class="valor-slider" id="val-avaliacao">0,65</span>
+            <input type="range" min="0" max="1" step="0.01" id="ultima_avaliacao" value="0.65"
+                   oninput="atualizarSlider('ultima_avaliacao','val-avaliacao')">
+          </label>
+          <label>
+            Número de Projetos <span class="valor-slider" id="val-projetos">4</span>
+            <input type="range" min="1" max="10" step="1" id="numero_projetos" value="4"
+                   oninput="atualizarSlider('numero_projetos','val-projetos')">
+          </label>
+          <label>
+            Média de Horas Mensais <span class="valor-slider" id="val-horas">211</span>
+            <input type="range" min="120" max="310" step="1" id="media_horas_mensais" value="211"
+                   oninput="atualizarSlider('media_horas_mensais','val-horas')">
+          </label>
+          <label>
+            Tempo na Empresa (anos) <span class="valor-slider" id="val-tempo">4</span>
+            <input type="range" min="0" max="15" step="1" id="tempo_empresa" value="4"
+                   oninput="atualizarSlider('tempo_empresa','val-tempo')">
+          </label>
+          <label>
+            Acidente de Trabalho
+            <select id="acidente_trabalho">
+              <option value="0">Não</option>
+              <option value="1">Sim</option>
+            </select>
+          </label>
+          <label>
+            Promoção Últimos 5 Anos
+            <select id="promocao_ultimos_5anos">
+              <option value="0">Não</option>
+              <option value="1">Sim</option>
+            </select>
+          </label>
+          <label>
+            Departamento
+            <select id="departamento">
+              <option>RH</option><option>TI</option><option>administrativo</option>
+              <option>financeiro</option><option>gerenciamento</option><option>marketing</option>
+              <option>produto</option><option>suporte</option><option>tecnico</option><option>vendas</option>
+            </select>
+          </label>
+          <label>
+            Salário
+            <select id="salario">
+              <option>baixo</option><option>medio</option><option>alto</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="pred-loading" id="pred-status">
+        <div class="spinner"></div>
+        <span id="pred-status-text">Carregando Pyodide (Python + scikit-learn)...</span>
+      </div>
+
+      <div class="pred-botoes">
+        <button class="btn btn-primary" onclick="predict()">Prever Risco</button>
+        <button class="btn btn-outline" onclick="preencherExemplo()" style="color:var(--text);border-color:var(--border)">Exemplo Médio</button>
+      </div>
+
+      <div class="pred-result" id="pred-result">
+        <div class="stat" style="display:inline-block;padding:2rem 3rem">
+          <div class="pred-prob" id="prob-value">—</div>
+          <div class="pred-label">Probabilidade de Turnover</div>
+          <div class="risk-badge" id="risk-badge"></div>
+        </div>
+        <div class="pred-features-list" id="pred-summary"></div>
+      </div>
+
+      <div class="pred-erro" id="pred-erro" style="display:none"></div>
+
+      <details style="margin-top:1.5rem;cursor:pointer;font-size:0.85rem" open>
+        <summary style="font-weight:600;color:var(--muted);padding:0.25rem 0"><u>Como funciona?</u></summary>
+        <div style="padding:0.75rem 1rem;background:#f8fafc;border-radius:8px;border:1px solid var(--border);color:var(--muted);margin-top:0.5rem">
+          <p style="margin-bottom:0.5rem"><strong>Python (via Pyodide / WebAssembly) executado no navegador:</strong></p>
+          <ol style="padding-left:1.25rem;line-height:1.8">
+            <li><strong>Pyodide</strong> carrega o interpretador <strong>Python + numpy</strong> compilado para WebAssembly (~6 MB).</li>
+            <li>O arquivo <code>modelo_turnover_pyodide.pkl</code> (exportado do <code>modelo_turnover.pkl</code> original) &eacute; baixado e carregado.</li>
+            <li>Os par&acirc;metros do pipeline (<code>StandardScaler</code>, <code>OneHotEncoder</code>, 100 &aacute;rvores do <code>GradientBoosting</code>) s&atilde;o reconstru&iacute;dos e executados manualmente em Python.</li>
+            <li>O resultado &eacute; exibido na p&aacute;gina.</li>
+          </ol>
+          <p style="margin-top:0.5rem;font-size:0.8rem;opacity:0.7">Infer&ecirc;ncia 100% client-side (WebAssembly + Python). Modelo exportado de <code>modelo_turnover.pkl</code> (sklearn 1.8.0) &rarr; pickle port&aacute;til (55 KB).</p>
+        </div>
+      </details>
     </div>
   </section>
 </div>
@@ -1343,6 +1595,179 @@
   }
 
   loadMetrics();
+
+  // =====================================================================
+  // Preditor de Turnover — Engine de Inferencia (Pyodide + .pkl original)
+  // =====================================================================
+
+  let PYODIDE = null;
+
+  function atualizarSlider(inputId, displayId) {
+    const val = document.getElementById(inputId).value;
+    document.getElementById(displayId).textContent = val.replace('.', ',');
+  }
+
+  function formatarProb(p) {
+    return (p * 100).toFixed(2).replace('.', ',') + '%';
+  }
+
+  function getRiskLevel(prob) {
+    if (prob < 0.30) return { label: 'Baixo', cls: 'risk-baixo' };
+    if (prob < 0.60) return { label: 'Médio', cls: 'risk-medio' };
+    return { label: 'Alto', cls: 'risk-alto' };
+  }
+
+  function resumoFeatures() {
+    const labels = {
+      nivel_satisfacao: 'Satisfação', ultima_avaliacao: 'Avaliação',
+      numero_projetos: 'Projetos', media_horas_mensais: 'Horas',
+      tempo_empresa: 'Tempo (anos)', acidente_trabalho: 'Acidente',
+      promocao_ultimos_5anos: 'Promoção', departamento: 'Depto', salario: 'Salário'
+    };
+    const ids = ['nivel_satisfacao','ultima_avaliacao','numero_projetos','media_horas_mensais',
+                 'tempo_empresa','acidente_trabalho','promocao_ultimos_5anos','departamento','salario'];
+    return ids.map(id => {
+      const el = document.getElementById(id);
+      const val = el.tagName === 'SELECT' ? el.options[el.selectedIndex].text : el.value.replace('.', ',');
+      return `<span><strong>${labels[id]}:</strong> ${val}</span>`;
+    }).join('');
+  }
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pred-status');
+    const statusText = document.getElementById('pred-status-text');
+    try {
+      statusText.textContent = 'Carregando Pyodide (Python WebAssembly)...';
+      PYODIDE = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/' });
+
+      statusText.textContent = 'Instalando numpy...';
+      await PYODIDE.loadPackage('numpy');
+
+      statusText.textContent = 'Baixando modelo...';
+      const resp = await fetch('modelo_turnover_pyodide.pkl');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ao baixar modelo_turnover_pyodide.pkl');
+      const buffer = await resp.arrayBuffer();
+      PYODIDE.FS.writeFile('/model.pkl', new Uint8Array(buffer));
+
+      statusText.textContent = 'Carregando modelo com pickle...';
+      await PYODIDE.runPythonAsync(`
+import pickle
+import numpy as np
+
+with open('/model.pkl', 'rb') as f:
+    model = pickle.load(f)
+
+SCALER_MEAN = np.array(model['scaler']['mean'])
+SCALER_SCALE = np.array(model['scaler']['scale'])
+CATEGORIES = model['encoder']['categories']
+DROP_IDX = model['encoder']['drop_idx']
+INIT_RAW = model['gbc']['init_raw']
+LR = model['gbc']['learning_rate']
+TREES = model['gbc']['trees']
+
+def py_predict(satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao, dept, sal):
+    num = np.array([[satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao]], dtype=float)
+    scaled = (num - SCALER_MEAN) / SCALER_SCALE
+
+    dept_oh = [1 if c == dept else 0 for i, c in enumerate(CATEGORIES[0]) if i != DROP_IDX]
+    sal_oh  = [1 if c == sal  else 0 for i, c in enumerate(CATEGORIES[1]) if i != DROP_IDX]
+
+    feats = np.concatenate([scaled[0], dept_oh, sal_oh])
+
+    raw = INIT_RAW
+    for t in TREES:
+        node = 0
+        cl = t['children_left']
+        cr = t['children_right']
+        while cl[node] != -1:
+            if feats[t['feature'][node]] <= t['threshold'][node]:
+                node = cl[node]
+            else:
+                node = cr[node]
+        raw += LR * t['value'][node][0][0]
+
+    prob = 1.0 / (1.0 + np.exp(-raw))
+    return float(prob)
+`);
+
+      statusEl.className = 'pred-loading pronto';
+      statusText.textContent = 'Pyodide pronto! Modelo carregado.';
+    } catch (e) {
+      statusEl.className = 'pred-loading erro';
+      statusText.textContent = 'Erro ao carregar Pyodide: ' + e.message;
+      console.error('Pyodide init error:', e);
+    }
+  }
+
+  async function predict() {
+    const resultDiv = document.getElementById('pred-result');
+    const erroDiv = document.getElementById('pred-erro');
+    erroDiv.style.display = 'none';
+    resultDiv.classList.remove('ativo');
+
+    if (!PYODIDE) {
+      erroDiv.style.display = 'block';
+      erroDiv.textContent = 'Pyodide ainda está carregando. Aguarde um momento e tente novamente.';
+      return;
+    }
+
+    try {
+      const satisfacao   = +document.getElementById('nivel_satisfacao').value;
+      const avaliacao    = +document.getElementById('ultima_avaliacao').value;
+      const projetos     = +document.getElementById('numero_projetos').value;
+      const horas        = +document.getElementById('media_horas_mensais').value;
+      const tempo        = +document.getElementById('tempo_empresa').value;
+      const acidente     = +document.getElementById('acidente_trabalho').value;
+      const promocao     = +document.getElementById('promocao_ultimos_5anos').value;
+      const dept         = document.getElementById('departamento').value;
+      const sal          = document.getElementById('salario').value;
+
+      const prob = await PYODIDE.runPythonAsync(`
+py_predict(${satisfacao}, ${avaliacao}, ${projetos}, ${horas}, ${tempo}, ${acidente}, ${promocao}, '${dept}', '${sal}')
+`);
+      const risco = getRiskLevel(prob);
+
+      document.getElementById('prob-value').textContent = formatarProb(prob);
+      const badge = document.getElementById('risk-badge');
+      badge.className = 'risk-badge ' + risco.cls;
+      badge.textContent = 'Risco ' + risco.label + ' de Turnover';
+
+      document.getElementById('pred-summary').innerHTML = resumoFeatures();
+      resultDiv.classList.add('ativo');
+    } catch (e) {
+      erroDiv.style.display = 'block';
+      erroDiv.textContent = 'Erro na predição: ' + e.message;
+    }
+  }
+
+  function preencherExemplo() {
+    const m = {
+      nivel_satisfacao: 0.63, ultima_avaliacao: 0.65,
+      numero_projetos: 4, media_horas_mensais: 211,
+      tempo_empresa: 4, acidente_trabalho: 0,
+      promocao_ultimos_5anos: 0, departamento: 'vendas', salario: 'baixo'
+    };
+    document.getElementById('nivel_satisfacao').value = m.nivel_satisfacao;
+    document.getElementById('val-satisfacao').textContent = '0,63';
+    document.getElementById('ultima_avaliacao').value = m.ultima_avaliacao;
+    document.getElementById('val-avaliacao').textContent = '0,65';
+    document.getElementById('numero_projetos').value = m.numero_projetos;
+    document.getElementById('val-projetos').textContent = '4';
+    document.getElementById('media_horas_mensais').value = m.media_horas_mensais;
+    document.getElementById('val-horas').textContent = '211';
+    document.getElementById('tempo_empresa').value = m.tempo_empresa;
+    document.getElementById('val-tempo').textContent = '4';
+    document.getElementById('acidente_trabalho').value = '0';
+    document.getElementById('promocao_ultimos_5anos').value = '0';
+    document.getElementById('departamento').value = m.departamento;
+    document.getElementById('salario').value = m.salario;
+
+    const res = document.getElementById('pred-result');
+    if (res) res.classList.remove('ativo');
+  }
+
+  // Inicializar Pyodide no carregamento da pagina
+  initPyodide();
 </script>
 </body>
 </html>

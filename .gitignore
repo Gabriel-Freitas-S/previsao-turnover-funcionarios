@@ -18,3 +18,8 @@ Thumbs.db
 # Slides (gerados pelos scripts)
 # O PDF deve ser rastreado para que funcione no GitHub Pages
 !slides/apresentacao_turnover.pdf
+
+# Graphify
+graphify-out/
+.graphifyignore
+
