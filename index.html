@@ -1558,8 +1558,11 @@
 
 <script>
   // =====================================================================
-  // Slideshow Controls
+  // CONTROLES DA APRESENTAÇÃO DE SLIDES (MODO SLIDESHOW)
   // =====================================================================
+  // Controlamos os slides via DOM manipulando a classe CSS 'active'.
+  // Também utilizamos a Fullscreen API para cobrir toda a tela do navegador.
+  
   let currentSlide = 0;
   const slides = document.querySelectorAll('.pres-slide');
   const progressBar = document.getElementById('pres-progress-bar');
@@ -1567,13 +1570,15 @@
   const btnPrev = document.getElementById('pres-btn-prev');
   const btnNext = document.getElementById('pres-btn-next');
 
+  // Abre a apresentação em modo tela cheia (fullscreen)
   function openPresentation() {
     const overlay = document.getElementById('presentation-overlay');
     overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'; // Evita scroll na página de fundo
     currentSlide = 0;
     showSlide(currentSlide);
 
+    // Suporte multi-browser para requisitar modo tela cheia
     if (overlay.requestFullscreen) {
       overlay.requestFullscreen().catch(err => {
         console.log("Erro ao entrar em tela cheia:", err);
@@ -1587,10 +1592,11 @@
     }
   }
 
+  // Fecha a apresentação de slides e encerra o modo tela cheia
   function closePresentation() {
     const overlay = document.getElementById('presentation-overlay');
     overlay.classList.remove('active');
-    document.body.style.overflow = '';
+    document.body.style.overflow = ''; // Restaura o comportamento de scroll normal
 
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(err => {
@@ -1599,6 +1605,7 @@
     }
   }
 
+  // Escuta alterações de estado de tela cheia (ex: se o usuário apertar ESC)
   document.addEventListener('fullscreenchange', function() {
     if (!document.fullscreenElement) {
       const overlay = document.getElementById('presentation-overlay');
@@ -1609,6 +1616,7 @@
     }
   });
 
+  // Atualiza as classes CSS e os contadores visuais do slide selecionado
   function showSlide(index) {
     slides.forEach((slide, i) => {
       if (i === index) {
@@ -1620,30 +1628,36 @@
 
     currentSlide = index;
 
+    // Barra de progresso horizontal e contador numérico (ex: "Slide 2 / 10")
     const progressPercent = ((index + 1) / slides.length) * 100;
     progressBar.style.width = progressPercent + '%';
     counterText.innerText = 'Slide ' + (index + 1) + ' / ' + slides.length;
 
+    // Desabilita os botões de navegação se estiver nos extremos
     btnPrev.disabled = index === 0;
     btnNext.disabled = index === slides.length - 1;
   }
 
+  // Avança para o próximo slide
   function nextSlide() {
     if (currentSlide < slides.length - 1) {
       showSlide(currentSlide + 1);
     }
   }
 
+  // Retorna para o slide anterior
   function prevSlide() {
     if (currentSlide > 0) {
       showSlide(currentSlide - 1);
     }
   }
 
+  // Atalhos de teclado: Setas Direcional Esquerda (←) e Direcional Direita (→)
   document.addEventListener('keydown', function(event) {
     const overlay = document.getElementById('presentation-overlay');
     const lightbox = document.getElementById('lightbox');
-    if (lightbox.classList.contains('active')) return;
+    if (lightbox.classList.contains('active')) return; // Prioriza fechar o lightbox de imagem
+    
     if (overlay.classList.contains('active')) {
       if (event.key === 'ArrowRight') {
         nextSlide();
@@ -1655,8 +1669,10 @@
     }
   });
 
+  // Clique lateral para navegar nos slides (lado esquerdo = anterior, lado direito = próximo)
   const presentationOverlay = document.getElementById('presentation-overlay');
   presentationOverlay.addEventListener('click', function(event) {
+    // Se clicou em algum elemento interativo dentro do slide, não faz nada
     if (event.target.closest('.pres-slide')) {
       return;
     }
@@ -1670,8 +1686,11 @@
   });
 
   // =====================================================================
-  // Carrega métricas do metrics.json via fetch para popular as tabelas
+  // CARREGADOR DE MÉTRICAS DINÂMICAS (slides/metrics.json)
   // =====================================================================
+  // Lê o arquivo JSON exportado pelo script Python para atualizar os dados 
+  // das tabelas de performance de forma real, sem necessidade de hardcoding.
+  
   async function loadMetrics() {
     try {
       const resp = await fetch('slides/metrics.json');
@@ -1682,25 +1701,29 @@
       const metricKeys = ['accuracy', 'precision', 'recall', 'f1_score', 'roc_auc'];
       const metricLabels = ['Acurácia', 'Precisão', 'Recall (Sensibilidade)', 'F1-Score (Classe 1)', 'ROC-AUC'];
 
-      // Tabela principal (#resultados)
+      // Popula a tabela principal da página (#resultados)
       const tbody = document.getElementById('tabela-resultados');
       if (tbody) {
         tbody.innerHTML = '';
         metricKeys.forEach((key, i) => {
+          // Identifica qual modelo obteve o melhor valor para cada métrica individual
           const bestModel = Object.keys(modelNames).reduce((a, b) => {
             return (metrics[a] && metrics[b] && metrics[a][key] >= metrics[b][key]) ? a : b;
           });
           const bestLabels = { RegressaoLogistica: 'Reg. Logística', RandomForest: 'Random Forest', GradientBoosting: 'Grad. Boosting' };
           const isHighlight = key === 'f1_score' ? ' class="highlight"' : '';
+          
+          // Formatação para notação decimal brasileira (vírgula como separador)
           const rl = metrics.RegressaoLogistica ? metrics.RegressaoLogistica[key].toFixed(4).replace('.', ',') : '—';
           const rf = metrics.RandomForest ? metrics.RandomForest[key].toFixed(4).replace('.', ',') : '—';
           const gb = metrics.GradientBoosting ? metrics.GradientBoosting[key].toFixed(4).replace('.', ',') : '—';
           const best = bestLabels[bestModel] || '—';
+          
           tbody.innerHTML += `<tr${isHighlight}><td>${metricLabels[i]}</td><td>${rl}</td><td>${rf}</td><td>${gb}</td><td class="best">${best}</td></tr>`;
         });
       }
 
-      // Tabela apresentação (#pres-tabela-resultados)
+      // Popula a tabela secundária presente dentro dos slides de apresentação (#pres-tabela-resultados)
       const presBody = document.getElementById('pres-tabela-resultados');
       if (presBody) {
         presBody.innerHTML = '';
@@ -1709,11 +1732,12 @@
           const rf = metrics.RandomForest ? metrics.RandomForest[key].toFixed(4).replace('.', ',') : '—';
           const gb = metrics.GradientBoosting ? metrics.GradientBoosting[key].toFixed(4).replace('.', ',') : '—';
           const rowStyle = key === 'f1_score' ? ' style="background: rgba(37,99,235,0.15);"' : '';
+          
           presBody.innerHTML += `<tr${rowStyle}><td>${metricLabels[i]}</td><td style="color:#e2e8f0">${rl}</td><td style="color:#e2e8f0">${rf}</td><td style="color:#60a5fa;font-weight:700">${gb}</td></tr>`;
         });
       }
 
-      // Texto do melhor modelo
+      // Atualiza o texto descritivo informando o vencedor selecionado na validação
       if (metrics.best_model) {
         const bestLabels = { RegressaoLogistica: 'Regressão Logística', RandomForest: 'Random Forest', GradientBoosting: 'Gradient Boosting' };
         const bestName = bestLabels[metrics.best_model] || metrics.best_model;
@@ -1730,26 +1754,31 @@
   loadMetrics();
 
   // =====================================================================
-  // Preditor de Turnover — Engine de Inferencia (Pyodide + .pkl original)
+  // INFERÊNCIA CLIENT-SIDE (Pyodide + Numpy + Parâmetros do Pickle)
   // =====================================================================
-
+  // Carrega o Python em WebAssembly (Pyodide) para rodar o modelo no navegador.
+  
   let PYODIDE = null;
 
+  // Sincroniza o valor de sliders de entrada (ex: 0.63) com a exibição textual na tela
   function atualizarSlider(inputId, displayId) {
     const val = document.getElementById(inputId).value;
     document.getElementById(displayId).textContent = val.replace('.', ',');
   }
 
+  // Formata o float retornado pelo modelo para porcentagem brasileira
   function formatarProb(p) {
     return (p * 100).toFixed(2).replace('.', ',') + '%';
   }
 
+  // Mapeia a probabilidade de turnover em três níveis de risco corporativos
   function getRiskLevel(prob) {
     if (prob < 0.30) return { label: 'Baixo', cls: 'risk-baixo' };
     if (prob < 0.60) return { label: 'Médio', cls: 'risk-medio' };
     return { label: 'Alto', cls: 'risk-alto' };
   }
 
+  // Gera uma string resumida das características selecionadas para exibir no card de predição
   function resumoFeatures() {
     const labels = {
       nivel_satisfacao: 'Satisfação', ultima_avaliacao: 'Avaliação',
@@ -1766,30 +1795,38 @@
     }).join('');
   }
 
+  // Inicializa o ambiente WebAssembly carregando o Pyodide e baixando o modelo leve
   async function initPyodide() {
     const statusEl = document.getElementById('pred-status');
     const statusText = document.getElementById('pred-status-text');
     try {
       statusText.textContent = 'Carregando Pyodide (Python WebAssembly)...';
+      // Importa a biblioteca principal
       PYODIDE = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/' });
 
       statusText.textContent = 'Instalando numpy...';
       await PYODIDE.loadPackage('numpy');
 
       statusText.textContent = 'Baixando modelo...';
+      // Baixa os parâmetros salvos pelo export_pyodide_model.py
       const resp = await fetch('modelo_turnover_pyodide.pkl');
       if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ao baixar modelo_turnover_pyodide.pkl');
       const buffer = await resp.arrayBuffer();
+      // Escreve o buffer binário no File System virtual do Pyodide
       PYODIDE.FS.writeFile('/model.pkl', new Uint8Array(buffer));
 
       statusText.textContent = 'Carregando modelo com pickle...';
+      // Executa scripts Python no navegador para desserializar os parâmetros
+      // e construir a função de predição matemática manual baseada nas árvores do Gradient Boosting
       await PYODIDE.runPythonAsync(`
 import pickle
 import numpy as np
 
+# Carrega do File System virtual do Pyodide
 with open('/model.pkl', 'rb') as f:
     model = pickle.load(f)
 
+# Variáveis globais do modelo Pyodide
 SCALER_MEAN = np.array(model['scaler']['mean'])
 SCALER_SCALE = np.array(model['scaler']['scale'])
 CATEGORIES = model['encoder']['categories']
@@ -1799,26 +1836,35 @@ LR = model['gbc']['learning_rate']
 TREES = model['gbc']['trees']
 
 def py_predict(satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao, dept, sal):
+    # 1. Normalização escalar manual das variáveis numéricas
     num = np.array([[satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao]], dtype=float)
     scaled = (num - SCALER_MEAN) / SCALER_SCALE
 
+    # 2. Codificação One-Hot manual das variáveis categóricas respeitando o drop="first"
     dept_oh = [1 if c == dept else 0 for i, c in enumerate(CATEGORIES[0]) if i != DROP_IDX]
     sal_oh  = [1 if c == sal  else 0 for i, c in enumerate(CATEGORIES[1]) if i != DROP_IDX]
 
+    # Concatena em um vetor de features unificado
     feats = np.concatenate([scaled[0], dept_oh, sal_oh])
 
+    # 3. Inferência manual nas árvores de decisão do Gradient Boosting
+    # Começa com o valor constante inicial (prior)
     raw = INIT_RAW
     for t in TREES:
         node = 0
         cl = t['children_left']
         cr = t['children_right']
-        while cl[node] != -1:
+        # Percorre a árvore de decisão a partir da raiz (nó 0)
+        while cl[node] != -1:  # -1 indica nó folha terminal
+            # Compara a feature com o threshold para decidir ir para a esquerda ou direita
             if feats[t['feature'][node]] <= t['threshold'][node]:
                 node = cl[node]
             else:
                 node = cr[node]
+        # Aplica a taxa de aprendizado (learning rate) sobre o valor da folha
         raw += LR * t['value'][node][0][0]
 
+    # 4. Função Sigmoide (ativação logística) para converter o valor bruto em probabilidade de 0 a 1
     prob = 1.0 / (1.0 + np.exp(-raw))
     return float(prob)
 `);
@@ -1832,6 +1878,7 @@ def py_predict(satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao
     }
   }
 
+  // Executa a inferência a partir dos valores do formulário HTML
   async function predict() {
     const resultDiv = document.getElementById('pred-result');
     const erroDiv = document.getElementById('pred-erro');
@@ -1845,6 +1892,7 @@ def py_predict(satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao
     }
 
     try {
+      // Coleta os valores do DOM
       const satisfacao   = +document.getElementById('nivel_satisfacao').value;
       const avaliacao    = +document.getElementById('ultima_avaliacao').value;
       const projetos     = +document.getElementById('numero_projetos').value;
@@ -1855,24 +1903,27 @@ def py_predict(satisfacao, avaliacao, projetos, horas, tempo, acidente, promocao
       const dept         = document.getElementById('departamento').value;
       const sal          = document.getElementById('salario').value;
 
+      // Executa a predição chamando a função Python via Pyodide
       const prob = await PYODIDE.runPythonAsync(`
 py_predict(${satisfacao}, ${avaliacao}, ${projetos}, ${horas}, ${tempo}, ${acidente}, ${promocao}, '${dept}', '${sal}')
 `);
       const risco = getRiskLevel(prob);
 
+      // Renderiza as informações na tela
       document.getElementById('prob-value').textContent = formatarProb(prob);
       const badge = document.getElementById('risk-badge');
       badge.className = 'risk-badge ' + risco.cls;
       badge.textContent = 'Risco ' + risco.label + ' de Turnover';
 
       document.getElementById('pred-summary').innerHTML = resumoFeatures();
-      resultDiv.classList.add('ativo');
+      resultDiv.classList.add('ativo'); // Exibe a seção de resultados com animação CSS
     } catch (e) {
       erroDiv.style.display = 'block';
       erroDiv.textContent = 'Erro na predição: ' + e.message;
     }
   }
 
+  // Preenche o formulário com dados de exemplo de um funcionário para demonstração rápida
   function preencherExemplo() {
     const m = {
       nivel_satisfacao: 0.63, ultima_avaliacao: 0.65,
