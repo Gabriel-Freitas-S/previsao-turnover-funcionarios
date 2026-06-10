@@ -1,8 +1,11 @@
 # Previsão de Rotatividade de Funcionários (Turnover)
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gabriel-Freitas-S/previsao-turnover-funcionarios/blob/main/notebooks/previsao_turnover.ipynb)
+[![GitHub Wiki](https://img.shields.io/badge/Wiki-GitHub-blue?style=flat&logo=github)](https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios/wiki)
 
 Projeto de **Machine Learning** para previsão de rotatividade (*turnover*) de funcionários usando o dataset **HR Analytics (Giri Pujar, Kaggle)**.
+
+📚 **Documentação Completa:** Consulte a nossa [Wiki do GitHub](https://github.com/Gabriel-Freitas-S/previsao-turnover-funcionarios/wiki) para obter explicações teóricas e técnicas aprofundadas sobre cada fase do desenvolvimento.
 
 **Integrantes:** Gabriel Freitas Souza & Indyanny Rodrigues Peixinho  
 **Disciplina:** Machine Learning — Unidade 3
