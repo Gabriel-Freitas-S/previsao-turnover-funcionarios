@@ -23,3 +23,5 @@ Thumbs.db
 graphify-out/
 .graphifyignore
 
+# Playwright temporary testing artifacts
+.playwright-mcp/
