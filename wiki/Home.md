@@ -18,24 +18,24 @@ Como requisito adicional da disciplina, o projeto também aborda um **Eixo Anal�
 ---
 
 ## 📁 Páginas da Wiki
-Para explorar os detalhes do projeto, navegue pelas seguintes seções:
+Para explorar os detalhes do projeto, navegue pelas seções estruturadas abaixo:
 
-1. **[1. Dataset & Análise Exploratória (EDA)](1.-Dataset-&-Análise-Exploratória-de-Dados-\(EDA\))**
-   * Detalhamento dos atributos do dataset *HR Analytics* e os principais insights gerados sobre a rotatividade dos colaboradores.
-2. **[2. Pré-processamento e Divisão dos Dados](2.-Pré-processamento-e-Divisão-dos-Dados)**
-   * Estratégias de tratamento de dados (One-Hot Encoding, StandardScaler), particionamento estratificado e prevenção de *Data Leakage*.
-3. **[3. Modelos de Machine Learning](3.-Modelos-de-Machine-Learning)**
-   * Detalhes sobre os classificadores testados (Regressão Logística, Random Forest e Gradient Boosting), otimização de hiperparâmetros com GridSearchCV e balanceamento de classes.
-4. **[4. Avaliação e Resultados](4.-Avaliação-e-Resultados)**
-   * Comparação de desempenho dos modelos, curva ROC, matrizes de confusão e a importância do F1-Score diante do *Paradoxo da Acurácia*.
-5. **[5. Eixo Analítico Secundário (Bike Sharing)](5.-Eixo-Analítico-Secundário-\(Bike-Sharing\))**
-   * Transposição analítica para o problema de regressão contínua utilizando a base *Bike Sharing* (UCI), com foco em modelos OLS e Random Forest Regressor e a remoção de variáveis de vazamento.
-6. **[6. Interface Web e Pyodide](6.-Interface-Web-e-Pyodide)**
-   * Funcionamento do painel interativo frontend executando o modelo diretamente no navegador do cliente usando Pyodide (WASM).
-7. **[7. Estrutura e Explicação do Código](7.-Estrutura-e-Explicação-do-Código)**
-   * Detalhamento técnico passo a passo e documentação de funções de cada arquivo do projeto: [main.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/main.py), [generate_slides.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/generate_slides.py), [export_pyodide_model.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/export_pyodide_model.py) e [index.html](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/index.html).
-8. **[8. Como Executar e Reproduzir](8.-Como-Executar-e-Reproduzir)**
-   * Guia prático de instalação de dependências, execução do pipeline de ML, geração de slides em PDF e inicialização da interface web.
+*   📊 **[1. Dataset & Análise Exploratória (EDA)](1.-Dataset-&-Análise-Exploratória-de-Dados-\(EDA\))**
+    *   *Detalhamento dos atributos do dataset HR Analytics e os principais insights gerados sobre a rotatividade dos colaboradores.*
+*   ⚙️ **[2. Pré-processamento e Divisão dos Dados](2.-Pré-processamento-e-Divisão-dos-Dados)**
+    *   *Estratégias de tratamento de dados (One-Hot Encoding, StandardScaler), particionamento estratificado e prevenção de Data Leakage.*
+*   🤖 **[3. Modelos de Machine Learning](3.-Modelos-de-Machine-Learning)**
+    *   *Detalhes sobre os classificadores testados (Regressão Logística, Random Forest e Gradient Boosting), otimização de hiperparâmetros com GridSearchCV e balanceamento de classes.*
+*   📈 **[4. Avaliação e Resultados](4.-Avaliação-e-Resultados)**
+    *   *Comparação de desempenho dos modelos, curva ROC, matrizes de confusão e a importância do F1-Score diante do Paradoxo da Acurácia.*
+*   🚲 **[5. Eixo Analítico Secundário (Bike Sharing)](5.-Eixo-Analítico-Secundário-\(Bike-Sharing\))**
+    *   *Transposição analítica para o problema de regressão contínua utilizando a base Bike Sharing (UCI), com foco em modelos OLS e Random Forest Regressor e a remoção de variáveis de vazamento.*
+*   🌐 **[6. Interface Web e Pyodide](6.-Interface-Web-e-Pyodide)**
+    *   *Funcionamento do painel interativo frontend executando o modelo diretamente no navegador do cliente usando Pyodide (WASM).*
+*   📁 **[7. Estrutura e Explicação do Código](7.-Estrutura-e-Explicação-do-Código)**
+    *   *Detalhamento técnico passo a passo e documentação de funções de cada arquivo do projeto: [main.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/main.py), [generate_slides.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/generate_slides.py), [export_pyodide_model.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/export_pyodide_model.py) e [index.html](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/index.html).*
+*   🚀 **[8. Como Executar e Reproduzir](8.-Como-Executar-e-Reproduzir)**
+    *   *Guia prático de instalação de dependências, execução do pipeline de ML, geração de slides em PDF e inicialização da interface web.*
 
 ---
 
