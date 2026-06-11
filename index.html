@@ -1130,35 +1130,35 @@
             <tr>
               <td>Acurácia</td>
               <td>0,9840</td>
-              <td>0,9877</td>
+              <td>0,9860</td>
               <td>0,9860</td>
               <td class="best">Random Forest</td>
             </tr>
             <tr>
               <td>Precisão</td>
               <td>0,9508</td>
-              <td class="highlight"><strong>0,9772</strong></td>
-              <td>0,9757</td>
-              <td class="best">Random Forest</td>
+              <td>0,9587</td>
+              <td class="highlight"><strong>0,9757</strong></td>
+              <td class="best">Grad. Boosting</td>
             </tr>
             <tr>
               <td>Recall (Sensibilidade)</td>
               <td class="highlight"><strong>0,9831</strong></td>
-              <td>0,9703</td>
+              <td>0,9831</td>
               <td>0,9647</td>
               <td class="best">Reg. Logística</td>
             </tr>
             <tr class="highlight">
               <td>F1-Score (Classe 1) ★</td>
               <td>0,9667</td>
-              <td>0,9738</td>
+              <td>0,9707</td>
               <td class="highlight"><strong>0,9702</strong></td>
               <td class="best">Random Forest</td>
             </tr>
             <tr>
               <td>ROC-AUC</td>
               <td>0,9989</td>
-              <td>0,9986</td>
+              <td>0,9987</td>
               <td class="highlight"><strong>0,9992</strong></td>
               <td class="best">Gradient Boosting</td>
             </tr>
@@ -1246,28 +1246,28 @@
       <div class="pred-form">
         <div class="grid-3">
           <label>
-            Nível de Satisfação <span class="valor-slider" id="val-satisfacao">0,63</span>
-            <input type="range" min="0" max="1" step="0.01" id="nivel_satisfacao" value="0.63"
+            Nível de Satisfação <span class="valor-slider" id="val-satisfacao">0,80</span>
+            <input type="range" min="0" max="1" step="0.01" id="nivel_satisfacao" value="0.80"
                    oninput="atualizarSlider('nivel_satisfacao','val-satisfacao')">
           </label>
           <label>
-            Última Avaliação <span class="valor-slider" id="val-avaliacao">0,65</span>
-            <input type="range" min="0" max="1" step="0.01" id="ultima_avaliacao" value="0.65"
+            Última Avaliação <span class="valor-slider" id="val-avaliacao">0,70</span>
+            <input type="range" min="0" max="1" step="0.01" id="ultima_avaliacao" value="0.70"
                    oninput="atualizarSlider('ultima_avaliacao','val-avaliacao')">
           </label>
           <label>
-            Número de Projetos <span class="valor-slider" id="val-projetos">4</span>
-            <input type="range" min="1" max="10" step="1" id="numero_projetos" value="4"
+            Número de Projetos <span class="valor-slider" id="val-projetos">3</span>
+            <input type="range" min="1" max="10" step="1" id="numero_projetos" value="3"
                    oninput="atualizarSlider('numero_projetos','val-projetos')">
           </label>
           <label>
-            Média de Horas Mensais <span class="valor-slider" id="val-horas">211</span>
-            <input type="range" min="120" max="310" step="1" id="media_horas_mensais" value="211"
+            Média de Horas Mensais <span class="valor-slider" id="val-horas">180</span>
+            <input type="range" min="120" max="310" step="1" id="media_horas_mensais" value="180"
                    oninput="atualizarSlider('media_horas_mensais','val-horas')">
           </label>
           <label>
-            Tempo na Empresa (anos) <span class="valor-slider" id="val-tempo">4</span>
-            <input type="range" min="0" max="15" step="1" id="tempo_empresa" value="4"
+            Tempo na Empresa (anos) <span class="valor-slider" id="val-tempo">3</span>
+            <input type="range" min="0" max="15" step="1" id="tempo_empresa" value="3"
                    oninput="atualizarSlider('tempo_empresa','val-tempo')">
           </label>
           <label>
@@ -1295,7 +1295,7 @@
           <label>
             Salário
             <select id="salario">
-              <option>baixo</option><option>medio</option><option>alto</option>
+              <option>baixo</option><option selected>medio</option><option>alto</option>
             </select>
           </label>
         </div>
@@ -1308,7 +1308,9 @@
 
       <div class="pred-botoes">
         <button class="btn btn-primary" onclick="predict()">Prever Risco</button>
-        <button class="btn btn-outline" onclick="preencherExemplo()" style="color:var(--text);border-color:var(--border)">Exemplo Médio</button>
+        <button class="btn btn-outline" onclick="preencherExemplo('baixo')" style="color:var(--text);border-color:var(--border)">Exemplo Baixo Risco</button>
+        <button class="btn btn-outline" onclick="preencherExemplo('medio')" style="color:var(--text);border-color:var(--border)">Exemplo Médio Risco</button>
+        <button class="btn btn-outline" onclick="preencherExemplo('alto')" style="color:var(--text);border-color:var(--border)">Exemplo Alto Risco</button>
       </div>
 
       <div class="pred-result" id="pred-result">
@@ -1509,11 +1511,11 @@
                 </tr>
               </thead>
               <tbody id="pres-tabela-resultados">
-                <tr><td>Acurácia</td><td style="color:#e2e8f0">0,9840</td><td style="color:#e2e8f0">0,9877</td><td style="color:#60a5fa;font-weight:700">0,9860</td></tr>
-                <tr><td>Precisão</td><td style="color:#e2e8f0">0,9508</td><td style="color:#e2e8f0">0,9772</td><td style="color:#60a5fa;font-weight:700">0,9757</td></tr>
-                <tr><td>Recall</td><td style="color:#e2e8f0">0,9831</td><td style="color:#e2e8f0">0,9703</td><td style="color:#60a5fa;font-weight:700">0,9647</td></tr>
-                <tr style="background: rgba(37,99,235,0.15);"><td>F1-Score</td><td style="color:#e2e8f0">0,9667</td><td style="color:#e2e8f0">0,9738</td><td style="color:#60a5fa;font-weight:700">0,9702</td></tr>
-                <tr><td>ROC-AUC</td><td style="color:#e2e8f0">0,9989</td><td style="color:#e2e8f0">0,9986</td><td style="color:#60a5fa;font-weight:700">0,9992</td></tr>
+                <tr><td>Acurácia</td><td style="color:#e2e8f0">0,9840</td><td style="color:#e2e8f0">0,9860</td><td style="color:#60a5fa;font-weight:700">0,9860</td></tr>
+                <tr><td>Precisão</td><td style="color:#e2e8f0">0,9508</td><td style="color:#e2e8f0">0,9587</td><td style="color:#60a5fa;font-weight:700">0,9757</td></tr>
+                <tr><td>Recall</td><td style="color:#e2e8f0">0,9831</td><td style="color:#e2e8f0">0,9831</td><td style="color:#60a5fa;font-weight:700">0,9647</td></tr>
+                <tr style="background: rgba(37,99,235,0.15);"><td>F1-Score</td><td style="color:#e2e8f0">0,9667</td><td style="color:#e2e8f0">0,9707</td><td style="color:#60a5fa;font-weight:700">0,9702</td></tr>
+                <tr><td>ROC-AUC</td><td style="color:#e2e8f0">0,9989</td><td style="color:#e2e8f0">0,9987</td><td style="color:#60a5fa;font-weight:700">0,9992</td></tr>
               </tbody>
             </table>
           </div>
@@ -1924,25 +1926,42 @@ py_predict(${satisfacao}, ${avaliacao}, ${projetos}, ${horas}, ${tempo}, ${acide
   }
 
   // Preenche o formulário com dados de exemplo de um funcionário para demonstração rápida
-  function preencherExemplo() {
-    const m = {
-      nivel_satisfacao: 0.63, ultima_avaliacao: 0.65,
-      numero_projetos: 4, media_horas_mensais: 211,
-      tempo_empresa: 4, acidente_trabalho: 0,
-      promocao_ultimos_5anos: 0, departamento: 'vendas', salario: 'baixo'
+  function preencherExemplo(tipo) {
+    let m = {
+      nivel_satisfacao: 0.80, ultima_avaliacao: 0.70,
+      numero_projetos: 3, media_horas_mensais: 180,
+      tempo_empresa: 3, acidente_trabalho: 0,
+      promocao_ultimos_5anos: 0, departamento: 'vendas', salario: 'medio'
     };
+
+    if (tipo === 'medio') {
+      m = {
+        nivel_satisfacao: 0.45, ultima_avaliacao: 0.70,
+        numero_projetos: 2, media_horas_mensais: 160,
+        tempo_empresa: 3, acidente_trabalho: 0,
+        promocao_ultimos_5anos: 0, departamento: 'vendas', salario: 'baixo'
+      };
+    } else if (tipo === 'alto') {
+      m = {
+        nivel_satisfacao: 0.10, ultima_avaliacao: 0.90,
+        numero_projetos: 6, media_horas_mensais: 280,
+        tempo_empresa: 4, acidente_trabalho: 0,
+        promocao_ultimos_5anos: 0, departamento: 'vendas', salario: 'baixo'
+      };
+    }
+
     document.getElementById('nivel_satisfacao').value = m.nivel_satisfacao;
-    document.getElementById('val-satisfacao').textContent = '0,63';
+    document.getElementById('val-satisfacao').textContent = String(m.nivel_satisfacao).replace('.', ',');
     document.getElementById('ultima_avaliacao').value = m.ultima_avaliacao;
-    document.getElementById('val-avaliacao').textContent = '0,65';
+    document.getElementById('val-avaliacao').textContent = String(m.ultima_avaliacao).replace('.', ',');
     document.getElementById('numero_projetos').value = m.numero_projetos;
-    document.getElementById('val-projetos').textContent = '4';
+    document.getElementById('val-projetos').textContent = String(m.numero_projetos);
     document.getElementById('media_horas_mensais').value = m.media_horas_mensais;
-    document.getElementById('val-horas').textContent = '211';
+    document.getElementById('val-horas').textContent = String(m.media_horas_mensais);
     document.getElementById('tempo_empresa').value = m.tempo_empresa;
-    document.getElementById('val-tempo').textContent = '4';
-    document.getElementById('acidente_trabalho').value = '0';
-    document.getElementById('promocao_ultimos_5anos').value = '0';
+    document.getElementById('val-tempo').textContent = String(m.tempo_empresa);
+    document.getElementById('acidente_trabalho').value = String(m.acidente_trabalho);
+    document.getElementById('promocao_ultimos_5anos').value = String(m.promocao_ultimos_5anos);
     document.getElementById('departamento').value = m.departamento;
     document.getElementById('salario').value = m.salario;
 

@@ -48,11 +48,11 @@ Três classificadores treinados com **GridSearchCV + StratifiedKFold (5 folds)**
 
 | Métrica | Regressão Logística | Random Forest | Gradient Boosting |
 |---|---|---|---|
-| Acurácia | 98,40% | 98,77% | 98,60% |
-| Precisão | 95,08% | **97,72%** | 97,57% |
-| Recall | **98,31%** | 97,03% | 96,47% |
-| **F1-Score** ★ | 96,67% | **97,38%** | 97,02% |
-| ROC-AUC | 99,89% | 99,86% | **99,92%** |
+| Acurácia | 98,40% | 98,60% | 98,60% |
+| Precisão | 95,08% | 95,87% | **97,57%** |
+| Recall | **98,31%** | **98,31%** | 96,47% |
+| **F1-Score** ★ | 96,67% | **97,07%** | 97,02% |
+| ROC-AUC | 99,89% | 99,87% | **99,92%** |
 
 > ★ Métrica principal de seleção (desbalanceamento ~76% ficou / ~24% saiu)
 
@@ -86,10 +86,12 @@ previsao-turnover-funcionarios/
 │
 ├── src/
 │   ├── main.py                   # Pipeline de ML: treino, avaliação e EDA
-│   └── generate_slides.py        # Gerador de apresentação PDF
+│   ├── generate_slides.py        # Gerador de apresentação PDF
+│   └── export_pyodide_model.py   # Exporta o melhor modelo para formato Pyodide
 │
 ├── index.html                    # Interface web com visualização e modo slideshow
 ├── modelo_turnover.pkl           # Melhor modelo persistido (GradientBoosting)
+├── modelo_turnover_pyodide.pkl   # Modelo exportado e otimizado para Pyodide
 ├── requirements.txt              # Dependências do projeto
 └── README.md                     # Este arquivo
 ```
