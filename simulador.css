@@ -1,0 +1,373 @@
+/* =====================================================================
+   Estilos do Simulador Visual e Interativo (Algoritmos)
+   ===================================================================== */
+.vis-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.vis-tab-btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background: none;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+.vis-tab-btn:hover {
+  color: var(--accent);
+}
+.vis-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.vis-tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+.vis-tab-content.active {
+  display: block;
+}
+
+.vis-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .vis-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vis-panel-left {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  width: 100%;
+}
+
+.vis-panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Logistic Regression CSS */
+.lr-plot-container {
+  width: 100%;
+  position: relative;
+  max-width: 300px;
+  aspect-ratio: 1;
+}
+.lr-points circle {
+  transition: fill 0.2s, stroke 0.2s, r 0.2s;
+}
+.lr-boundary {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-dasharray: 4 2;
+  transition: all 0.1s ease-out;
+}
+.lr-sigmoid-path {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+.lr-sigmoid-prob-line {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 2;
+}
+
+/* Control group styles */
+.vis-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.vis-control-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vis-slider-val {
+  font-family: monospace;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+.vis-control-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.vis-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  text-align: center;
+}
+.vis-metric-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+.vis-metric-card .num-val {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.vis-metric-card .label-val {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Random Forest CSS */
+.rf-trees-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 600px;
+}
+@media (max-width: 500px) {
+  .rf-trees-container {
+    grid-template-columns: 1fr;
+  }
+}
+.rf-tree-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0.75rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.rf-tree-card.active-tree {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
+}
+.rf-tree-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+.rf-node {
+  fill: #fff;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  transition: all 0.3s;
+}
+.rf-node.active-node {
+  stroke: var(--accent);
+  fill: var(--accent-light);
+  stroke-width: 2.5;
+}
+.rf-node.leaf-fica {
+  fill: #f0fdf4;
+  stroke: var(--success);
+}
+.rf-node.leaf-fica.active-node {
+  fill: #dcfce7;
+  stroke-width: 3;
+}
+.rf-node.leaf-sai {
+  fill: #fef2f2;
+  stroke: var(--danger);
+}
+.rf-node.leaf-sai.active-node {
+  fill: #fee2e2;
+  stroke-width: 3;
+}
+.rf-edge {
+  stroke: var(--border);
+  stroke-width: 1.5;
+  fill: none;
+  transition: stroke 0.3s, stroke-width 0.3s;
+}
+.rf-edge.active-edge {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+.rf-particle {
+  fill: gold;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
+}
+
+/* Gradient Boosting CSS */
+.gb-step-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+.gb-plot-svg {
+  width: 100%;
+  max-width: 450px;
+  height: 180px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.gb-tree-pred-svg {
+  width: 100%;
+  max-width: 450px;
+  height: 100px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.gb-residual-line {
+  stroke: var(--danger);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+.gb-pred-path {
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 3;
+  transition: all 0.3s ease;
+}
+.gb-weak-path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+/* GridSearchCV + KFold CSS */
+.kf-folds-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 1rem 0;
+}
+.kf-fold-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: opacity 0.3s ease;
+}
+.kf-fold-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: 60px;
+  color: var(--primary);
+}
+.kf-fold-blocks {
+  display: flex;
+  gap: 3px;
+  flex-grow: 1;
+}
+.kf-block {
+  flex-grow: 1;
+  height: 24px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+}
+.kf-block.train-fica { background-color: #3b82f6; } /* Blue (Train, Fica) */
+.kf-block.train-sai { background-color: #ef4444; }  /* Red (Train, Sai) */
+.kf-block.val-fica { background-color: #f59e0b; opacity: 0.95; }   /* Yellow-Orange (Val, Fica) */
+.kf-block.val-sai { background-color: #f97316; opacity: 0.95; }    /* Dark Orange (Val, Sai) */
+.kf-block.inactive { opacity: 0.25; filter: grayscale(80%); }
+
+.gs-grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+  margin: 1rem 0;
+}
+.gs-cell {
+  aspect-ratio: 1.5;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  position: relative;
+  transition: all 0.2s;
+}
+.gs-cell.evaluating {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+  animation: gs-pulse 0.8s infinite alternate;
+}
+.gs-cell.done {
+  background: #fff;
+  color: var(--primary);
+}
+.gs-cell.best-cell {
+  border-color: var(--success);
+  background: #f0fdf4;
+  color: var(--success);
+  box-shadow: 0 0 0 2px var(--success);
+}
+.gs-cell-params {
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.2;
+}
+.gs-cell-score {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 0.2rem;
+}
+@keyframes gs-pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+.vis-math {
+  background: #f1f5f9;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #0f172a;
+  border-left: 3px solid var(--accent);
+  margin: 0.5rem 0;
+}
