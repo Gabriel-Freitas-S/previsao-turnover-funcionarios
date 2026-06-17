@@ -28,11 +28,11 @@ Para explorar os detalhes do projeto, navegue pelas seções estruturadas abaixo
     *   *Detalhes sobre os classificadores testados (Regressão Logística, Random Forest e Gradient Boosting), otimização de hiperparâmetros com GridSearchCV e balanceamento de classes.*
 *   📈 **[4. Avaliação e Resultados](4.-Avaliação-e-Resultados)**
     *   *Comparação de desempenho dos modelos, curva ROC, matrizes de confusão e a importância do F1-Score diante do Paradoxo da Acurácia.*
-*   🌐 **[5. Interface Web e Pyodide](6.-Interface-Web-e-Pyodide)**
+*   🌐 **[5. Interface Web e Pyodide](5.-Interface-Web-e-Pyodide)**
     *   *Funcionamento do painel interativo frontend executando o modelo diretamente no navegador do cliente usando Pyodide (WASM).*
-*   📁 **[6. Estrutura e Explicação do Código](7.-Estrutura-e-Explicação-do-Código)**
+*   📁 **[6. Estrutura e Explicação do Código](6.-Estrutura-e-Explicação-do-Código)**
     *   *Detalhamento técnico passo a passo e documentação de funções de cada arquivo do projeto: [main.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/main.py), [generate_slides.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/generate_slides.py), [export_pyodide_model.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/export_pyodide_model.py) e [index.html](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/index.html).*
-*   🚀 **[7. Como Executar e Reproduzir](8.-Como-Executar-e-Reproduzir)**
+*   🚀 **[7. Como Executar e Reproduzir](7.-Como-Executar-e-Reproduzir)**
     *   *Guia prático de instalação de dependências, execução do pipeline de ML, geração de slides em PDF e inicialização da interface web.*
 
 ---
