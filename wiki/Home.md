@@ -13,7 +13,7 @@ Bem-vindo à wiki oficial do projeto de **Previsão de Rotatividade de Funcioná
 ## 🎯 Objetivo Geral
 O objetivo principal é conceber e implementar um pipeline completo de Machine Learning para prever se um funcionário possui propensão a deixar a empresa (Turnover). A predição antecipada é uma ferramenta estratégica crucial para o setor de Recursos Humanos (RH), permitindo intervenções proativas de retenção de talentos antes que ocorra a rescisão contratual.
 
-Como requisito adicional da disciplina, o projeto também aborda um **Eixo Analítico Secundário** focado em um problema de **Regressão Contínua**, comparando as metodologias de classificação e regressão sob a perspectiva do pré-processamento, modelagem e avaliação de métricas.
+
 
 ---
 
@@ -28,13 +28,11 @@ Para explorar os detalhes do projeto, navegue pelas seções estruturadas abaixo
     *   *Detalhes sobre os classificadores testados (Regressão Logística, Random Forest e Gradient Boosting), otimização de hiperparâmetros com GridSearchCV e balanceamento de classes.*
 *   📈 **[4. Avaliação e Resultados](4.-Avaliação-e-Resultados)**
     *   *Comparação de desempenho dos modelos, curva ROC, matrizes de confusão e a importância do F1-Score diante do Paradoxo da Acurácia.*
-*   🚲 **[5. Eixo Analítico Secundário (Bike Sharing)](5.-Eixo-Analítico-Secundário-\(Bike-Sharing\))**
-    *   *Transposição analítica para o problema de regressão contínua utilizando a base Bike Sharing (UCI), com foco em modelos OLS e Random Forest Regressor e a remoção de variáveis de vazamento.*
-*   🌐 **[6. Interface Web e Pyodide](6.-Interface-Web-e-Pyodide)**
+*   🌐 **[5. Interface Web e Pyodide](6.-Interface-Web-e-Pyodide)**
     *   *Funcionamento do painel interativo frontend executando o modelo diretamente no navegador do cliente usando Pyodide (WASM).*
-*   📁 **[7. Estrutura e Explicação do Código](7.-Estrutura-e-Explicação-do-Código)**
+*   📁 **[6. Estrutura e Explicação do Código](7.-Estrutura-e-Explicação-do-Código)**
     *   *Detalhamento técnico passo a passo e documentação de funções de cada arquivo do projeto: [main.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/main.py), [generate_slides.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/generate_slides.py), [export_pyodide_model.py](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/src/export_pyodide_model.py) e [index.html](file:///home/gabriel-freitas-souza/Projetos/previsao-turnover-funcionarios/index.html).*
-*   🚀 **[8. Como Executar e Reproduzir](8.-Como-Executar-e-Reproduzir)**
+*   🚀 **[7. Como Executar e Reproduzir](8.-Como-Executar-e-Reproduzir)**
     *   *Guia prático de instalação de dependências, execução do pipeline de ML, geração de slides em PDF e inicialização da interface web.*
 
 ---

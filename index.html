@@ -827,7 +827,7 @@
     <span class="badge">📊 HR Analytics — Kaggle (Giri Pujar)</span>
   </div>
   <h1>Previsão de Rotatividade de Funcionários</h1>
-  <p>Classificação Binária para Turnover com HR Analytics (Kaggle) e Estudo Transversal Comparativo de Regressão com Bike Sharing (UCI)</p>
+  <p>Classificação Binária para Turnover com HR Analytics (Kaggle)</p>
   
   <div class="group-members">
     <strong>Integrantes do Grupo:</strong> Gabriel Freitas Souza &amp; Indyanny Rodrigues Peixinho
@@ -856,7 +856,6 @@
   <a href="#dados">Dados &amp; Split</a>
   <a href="#eda">EDA</a>
   <a href="#metodologia-classificacao">Metodologia Classificação</a>
-  <a href="#eixo-secundario">Eixo Regressão (Bike)</a>
   <a href="#metricas">Métricas</a>
   <a href="#resultados">Resultados</a>
   <a href="#discussao">Discussão</a>
@@ -1051,69 +1050,24 @@
     </div>
   </section>
 
-  <!-- 5. Eixo Analítico Secundário: Regressão (Bike Sharing) -->
-  <section id="eixo-secundario">
-    <h2 class="section-title"><span class="num">5</span> Eixo Analítico Secundário: Regressão (Bike Sharing)</h2>
-    <div class="card">
-      <h3>Estudo Transversal Comparativo</h3>
-      <p>Em conformidade com as diretrizes do relatório técnico do trabalho, introduz-se a análise sobre o conjunto de dados <strong>Bike Sharing Dataset</strong> (UCI Machine Learning Repository). O objetivo é demonstrar a transição do paradigma de <strong>Classificação Binária</strong> para o de <strong>Regressão Numérica Contínua</strong>.</p>
-      <p><strong>Definição do Problema:</strong> Prever o número total de locações de bicicletas (variável contínua <code>cnt</code>) em uma base horária ou diária urbana.</p>
-
-      <div class="alert alert-warning">
-        <strong>⚠️ Ameaça Crítica de Vazamento de Dados (Data Leakage):</strong> Para treinar um modelo preditivo coerente para a variável <code>cnt</code>, é mandatório realizar a remoção prévia das colunas <code>casual</code> (locações por usuários esporádicos) e <code>registered</code> (locações por usuários associados). Dado que matematicamente <code>cnt = casual + registered</code>, manter estas variáveis no treino geraria uma regressão perfeita e inútil em ambiente produtivo, pois essas sub-contagens só são conhecidas <em>a posteriori</em>.
-      </div>
-      
-      <p><strong>Pré-processamento:</strong> Exclusão de IDs e marcadores temporais puros (<code>instant</code>, <code>dteday</code>). Aplicação de codificação One-Hot para atributos sazonais (estação, feriado, dia da semana) para evitar que o regressor infira hierarquias numéricas falsas entre categorias textuais ou códigos numéricos representativos.</p>
-    </div>
-
-    <div class="card">
-      <h3>Algoritmos de Regressão Analisados</h3>
-      <div class="algo-detail">
-        <h4>1. Regressão Linear Múltipla</h4>
-        <p><strong>Funcionamento:</strong> Assume que a variável alvo contínua $Y$ pode ser expressa como uma combinação linear de variáveis independentes $X$, minimizando a soma dos resíduos quadráticos (Mínimos Quadrados Ordinários — OLS):</p>
-        <p style="text-align: center; margin: 1rem 0; font-weight: 600;">$Y = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p + \epsilon$</p>
-        <p><strong>Vantagem:</strong> Cálculo analítico direto e coeficientes facilmente interpretáveis como taxas marginais de variação.</p>
-        <p><strong>Limitação:</strong> Incapaz de modelar interações não-lineares, como o comportamento climatológico complexo.</p>
-      </div>
-
-      <div class="algo-detail">
-        <h4>2. Random Forest Regressor</h4>
-        <p><strong>Funcionamento:</strong> Ensemble de árvores de regressão. O valor previsto final é a média aritmética simples das predições de todas as árvores individuais da floresta, estimadas sobre partições independentes (bootstrap).</p>
-        <p><strong>Vantagem:</strong> Mapeia relações não-lineares complexas e flutuações sazonais horárias urbanas com facilidade.</p>
-        <p><strong>Limitação:</strong> Não extrapola previsões para valores fora do intervalo visto no treino.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6. Métricas de Avaliação -->
+  <!-- 5. Métricas de Avaliação -->
   <section id="metricas">
-    <h2 class="section-title"><span class="num">6</span> Métricas de Avaliação e Desempenho</h2>
-    <div class="grid-2">
-      <div class="card">
-        <h3>Classificação (Turnover)</h3>
-        <p>Avaliar modelos desbalanceados puramente pela Acurácia é um <strong>erro de metodologia crítico</strong>. Um modelo simplista que classifique 100% dos funcionários como "Não vão sair" atingiria ~76% de acurácia, ocultando todos os desligamentos iminentes.</p>
-        <ul>
-          <li><strong>Precisão ($TP/(TP+FP)$):</strong> Assertividade dos alertas gerados (evita falsos positivos).</li>
-          <li><strong>Recall / Sensibilidade ($TP/(TP+FN)$):</strong> Percentual de saídas reais capturadas (prioridade para o RH).</li>
-          <li><strong>F1-Score:</strong> Média harmônica balanceada entre Precisão e Recall. Métrica de foco para seleção.</li>
-          <li><strong>ROC-AUC:</strong> Capacidade de discriminação entre as duas classes em qualquer limiar de corte.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Regressão (Bike Sharing)</h3>
-        <p>Para previsões numéricas contínuas de demanda, aplicam-se métricas baseadas na magnitude dos erros residuais:</p>
-        <ul>
-          <li><strong>RMSE (Root Mean Squared Error):</strong> Raiz quadrada da média dos erros elevados ao quadrado. Penaliza severamente desvios de grande magnitude.</li>
-          <li><strong>MAE (Mean Absolute Error):</strong> Média linear absoluta dos erros. Representa o desvio médio real.</li>
-          <li><strong>$R^2$ Score (Coeficiente de Determinação):</strong> Percentual de variância dos dados explicada pelas variáveis do modelo.</li>
-        </ul>
-      </div>
+    <h2 class="section-title"><span class="num">5</span> Métricas de Avaliação e Desempenho</h2>
+    <div class="card">
+      <h3>Classificação (Turnover)</h3>
+      <p>Avaliar modelos desbalanceados puramente pela Acurácia é um <strong>erro de metodologia crítico</strong>. Um modelo simplista que classifique 100% dos funcionários como "Não vão sair" atingiria ~76% de acurácia, ocultando todos os desligamentos iminentes.</p>
+      <ul>
+        <li><strong>Precisão ($TP/(TP+FP)$):</strong> Assertividade dos alertas gerados (evita falsos positivos).</li>
+        <li><strong>Recall / Sensibilidade ($TP/(TP+FN)$):</strong> Percentual de saídas reais capturadas (prioridade para o RH).</li>
+        <li><strong>F1-Score:</strong> Média harmônica balanceada entre Precisão e Recall. Métrica de foco para seleção.</li>
+        <li><strong>ROC-AUC:</strong> Capacidade de discriminação entre as duas classes em qualquer limiar de corte.</li>
+      </ul>
     </div>
   </section>
 
-  <!-- 7. Resultados -->
+  <!-- 6. Resultados -->
   <section id="resultados">
-    <h2 class="section-title"><span class="num">7</span> Resultados do Modelo de Turnover</h2>
+    <h2 class="section-title"><span class="num">6</span> Resultados do Modelo de Turnover</h2>
     <div class="card">
       <h3>Comparação das Métricas no Conjunto de Teste</h3>
       <p>Abaixo estão os resultados consolidados obtidos na base de teste final após a otimização dos hiperparâmetros de cada modelo via GridSearchCV no Treino. Os valores serão atualizados automaticamente após a execução do <code>main.py</code>:</p>
@@ -1207,9 +1161,9 @@
     </div>
   </section>
 
-  <!-- 8. Discussão -->
+  <!-- 7. Discussão -->
   <section id="discussao">
-    <h2 class="section-title"><span class="num">8</span> Discussão e Seleção de Modelos</h2>
+    <h2 class="section-title"><span class="num">7</span> Discussão e Seleção de Modelos</h2>
     <div class="grid-2">
       <div class="card">
         <h3>🎯 Modelo Vencedor: Gradient Boosting</h3>
@@ -1226,9 +1180,9 @@
     </div>
   </section>
 
-  <!-- 9. Conclusão -->
+  <!-- 8. Conclusão -->
   <section id="conclusao">
-    <h2 class="section-title"><span class="num">9</span> Conclusão</h2>
+    <h2 class="section-title"><span class="num">8</span> Conclusão</h2>
     <div class="card">
       <h3>Conclusão</h3>
       <ul>
@@ -1240,9 +1194,9 @@
     </div>
   </section>
 
-  <!-- 10. Preditor de Turnover -->
+  <!-- 9. Preditor de Turnover -->
   <section id="predictor">
-    <h2 class="section-title"><span class="num">10</span> Preditor de Turnover</h2>
+    <h2 class="section-title"><span class="num">9</span> Preditor de Turnover</h2>
     <div class="card">
       <p>Ajuste os dados do funcionário abaixo e clique em <strong>Prever Risco</strong> para simular a predição do modelo Gradient Boosting.</p>
 
@@ -1363,7 +1317,7 @@
     <div class="pres-progress-container">
       <div class="pres-progress-bar" id="pres-progress-bar"></div>
     </div>
-    <div class="pres-counter" id="pres-counter">Slide 1 / 10</div>
+    <div class="pres-counter" id="pres-counter">Slide 1 / 8</div>
     <button class="btn-close-pres" onclick="closePresentation()">× Sair</button>
   </div>
 
@@ -1439,21 +1393,8 @@
       </div>
     </div>
 
-    <!-- Slide 5: Eixo Secundário (Bike Sharing) -->
+    <!-- Slide 5: Modelagem - Classificação -->
     <div class="pres-slide" id="slide-5">
-      <h2>4. Eixo Analítico Secundário: Bike Sharing</h2>
-      <p><strong>Paradigma de Regressão Contínua:</strong> Transposição analítica usando o conjunto de dados da UCI para prever locações acumuladas de bicicletas (<code>cnt</code>).</p>
-      <div class="highlight-box" style="border-color: #d97706; background: rgba(217, 119, 6, 0.15);">
-        <strong>⚠️ Alerta de Data Leakage:</strong> Remoção compulsória das colunas <code>casual</code> e <code>registered</code>. A soma de ambas equivale à variável alvo final. Mantê-las inviabilizaria o modelo preditivo real.
-      </div>
-      <ul>
-        <li><strong>Pré-processamento:</strong> Exclusão de IDs ordinais (<code>instant</code>) e binarização de variáveis de clima/temporada via One-Hot encoding.</li>
-        <li><strong>Modelos:</strong> Regressão Linear Múltipla (OLS) vs Random Forest Regressor (ensemble não-linear por média de predições).</li>
-      </ul>
-    </div>
-
-    <!-- Slide 6: Modelagem - Classificação -->
-    <div class="pres-slide" id="slide-6">
       <h2>5. Modelos de Classificação e Hiperparâmetros</h2>
       <ul>
         <li><strong>Regressão Logística:</strong> Projeta probabilidades usando sigmoide e limites lineares. Otimizado hiperparâmetro de regularização <code>C</code>.</li>
@@ -1464,43 +1405,21 @@
       </ul>
     </div>
 
-    <!-- Slide 7: Modelagem - Regressão -->
-    <div class="pres-slide" id="slide-7">
-      <h2>6. Modelos de Regressão e Hiperparâmetros</h2>
+    <!-- Slide 6: Métricas de Avaliação -->
+    <div class="pres-slide" id="slide-6">
+      <h2>6. Métricas de Avaliação e o Paradoxo da Acurácia</h2>
+      <p><strong>Métricas de Classificação (Turnover):</strong></p>
       <ul>
-        <li><strong>Regressão Linear Múltipla:</strong> Ajusta uma função de coeficientes lineares tentando encontrar a reta que minimiza a soma dos erros quadráticos (OLS).</li>
-        <li><strong>Random Forest Regressor:</strong> Combina múltiplas subárvores de regressão para reduzir a variância e prever o valor contínuo final através da média aritmética das predições de cada árvore.</li>
-        <li><strong>Otimização por GridSearchCV:</strong> Ambos os paradigmas (classificação e regressão) utilizam busca em grade com validação cruzada K-Fold (5 folds) na partição de treino para selecionar os parâmetros ideais.</li>
+        <li>Acurácia é enganosa em bases assimétricas (~76% ficou).</li>
+        <li>F1-Score é a métrica principal de seleção (harmonização de Precisão e Recall).</li>
+        <li>Recall (Sensibilidade) é priorizado para o RH interceptar desligamentos.</li>
+        <li>ROC-AUC mede discriminação em todos os limiares de corte.</li>
       </ul>
     </div>
 
-    <!-- Slide 8: Métricas de Avaliação -->
-    <div class="pres-slide" id="slide-8">
-      <h2>7. Métricas de Avaliação e o Paradoxo da Acurácia</h2>
-      <div class="grid-2">
-        <div>
-          <p><strong>Métricas de Classificação (Turnover):</strong></p>
-          <ul>
-            <li>Acurácia é enganosa em bases assimétricas (~76% ficou).</li>
-            <li>F1-Score é a métrica principal de seleção (harmonização de Precisão e Recall).</li>
-            <li>Recall (Sensibilidade) é priorizado para o RH interceptar desligamentos.</li>
-            <li>ROC-AUC mede discriminação em todos os limiares de corte.</li>
-          </ul>
-        </div>
-        <div>
-          <p><strong>Métricas de Regressão (Bike Sharing):</strong></p>
-          <ul>
-            <li><strong>RMSE:</strong> Penaliza desvios residuais grandes elevados ao quadrado.</li>
-            <li><strong>MAE:</strong> Desvio médio linear tangível das locações.</li>
-            <li><strong>$R^2$ Score:</strong> Percentual explicativo da variância.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Slide 9: Resultados Comparados -->
-    <div class="pres-slide" id="slide-9">
-      <h2>8. Resultados do Modelo de Turnover (Teste)</h2>
+    <!-- Slide 7: Resultados Comparados -->
+    <div class="pres-slide" id="slide-7">
+      <h2>7. Resultados do Modelo de Turnover (Teste)</h2>
       <div class="grid-2">
         <div>
           <div class="table-wrap">
@@ -1533,9 +1452,9 @@
       </div>
     </div>
 
-    <!-- Slide 10: Conclusão -->
-    <div class="pres-slide" id="slide-10">
-      <h2>9. Conclusão</h2>
+    <!-- Slide 8: Conclusão -->
+    <div class="pres-slide" id="slide-8">
+      <h2>8. Conclusão</h2>
       <ul>
         <li>O pipeline de Machine Learning demonstrou eficácia na identificação de colaboradores propensos ao desligamento com o dataset <strong>HR Analytics (Giri Pujar, Kaggle)</strong> — 14.999 registros, CC0: Public Domain.</li>
         <li>O <strong>nível de satisfação</strong> e a <strong>média de horas mensais</strong> destacam-se como os maiores fatores preditivos de turnover.</li>

@@ -19,12 +19,10 @@ Estrutura da Apresentação de Slides:
     Slide 2: 1. Introdução e Relevância do Problema (Evasão voluntária no RH)
     Slide 3: 2. Obtenção e Preparação dos Dados (Limpeza, escala, One-Hot)
     Slide 4: 3. Análise Exploratória de Dados (EDA) (Visualizações e Insights)
-    Slide 5: 4. Eixo Analítico Secundário (Estudo Bike Sharing UCI)
-    Slide 6: 5. Modelos de Classificação e Hiperparâmetros (Reg. Logística, RF, GB)
-    Slide 7: 6. Modelos de Regressão e Hiperparâmetros (Reg. Linear, RF Regressor)
-    Slide 8: 7. Métricas de Avaliação e o Paradoxo da Acurácia (F1, Recall, RMSE)
-    Slide 9: 8. Resultados do Modelo de Turnover (Tabela de Métricas e Curva ROC)
-    Slide 10: 9. Conclusão e Encerramento
+    Slide 5: 5. Modelos de Classificação e Hiperparâmetros (Reg. Logística, RF, GB)
+    Slide 6: 6. Métricas de Avaliação e o Paradoxo da Acurácia (F1, Recall)
+    Slide 7: 7. Resultados do Modelo de Turnover (Tabela de Métricas e Curva ROC)
+    Slide 8: 8. Conclusão e Encerramento
 ================================================================================
 """
 
@@ -261,37 +259,7 @@ def build_presentation() -> None:
     pdf.add_image_centered(os.path.join(SLIDES_DIR, "eda_plots.png"), w=125)
 
     # =====================================================================
-    # Slide 5 - 4. Eixo Analítico Secundário: Bike Sharing
-    # =====================================================================
-    pdf.add_section_slide("4", "Eixo Analítico Secundário: Bike Sharing")
-    pdf.add_body_text(
-        "Paradigma de Regressão Contínua: Transposição analítica usando o conjunto de dados da UCI para prever locações acumuladas de bicicletas (cnt)."
-    )
-    pdf.ln(3)
-
-    # Caixa de alerta decorativo em tom amarelo/laranja destacando Data Leakage
-    pdf.set_fill_color(255, 251, 235)
-    pdf.set_draw_color(217, 119, 6)
-    pdf.set_line_width(0.4)
-    current_y = pdf.get_y()
-    pdf.rect(10, current_y, 277, 24, style="FD")
-    
-    # Texto do alerta
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_text_color(217, 119, 6)
-    pdf.text(13, current_y + 6, "Alerta de Data Leakage (Vazamento de Dados):")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.set_text_color(40, 40, 40)
-    pdf.set_xy(13, current_y + 8)
-    pdf.multi_cell(271, 5, "Remoção compulsória das colunas casual e registered. A soma de ambas equivale à variável alvo final. Mantê-las inviabilizaria o modelo preditivo real no mundo real.")
-
-    # Restaura posição
-    pdf.set_xy(10, current_y + 28)
-    pdf.add_bullet("Pré-processamento: Exclusão de IDs ordinais (instant) e binarização de variáveis de clima/temporada via One-Hot encoding.")
-    pdf.add_bullet("Modelos: Regressão Linear Múltipla (OLS) vs Random Forest Regressor (ensemble não-linear por média de predições).")
-
-    # =====================================================================
-    # Slide 6 - 5. Modelos de Classificação e Hiperparâmetros
+    # Slide 5 - 5. Modelos de Classificação e Hiperparâmetros
     # =====================================================================
     pdf.add_section_slide("5", "Modelos de Classificação e Hiperparâmetros")
     pdf.add_bullet("Regressão Logística: Projeta probabilidades usando sigmoide e limites lineares. Otimizado hiperparâmetro de regularização C.")
@@ -302,31 +270,18 @@ def build_presentation() -> None:
     pdf.add_body_text("Otimização: GridSearchCV com StratifiedKFold (5 folds) otimizando F1-Score.")
 
     # =====================================================================
-    # Slide 7 - 6. Modelos de Regressão e Hiperparâmetros
+    # Slide 6 - 6. Métricas de Avaliação e o Paradoxo da Acurácia
     # =====================================================================
-    pdf.add_section_slide("6", "Modelos de Regressão e Hiperparâmetros")
-    pdf.add_bullet("Regressão Linear Múltipla: Ajusta uma função de coeficientes lineares tentando encontrar a reta que minimiza a soma dos erros quadráticos.")
-    pdf.add_bullet("Random Forest Regressor: Combina múltiplas subárvores de regressão para reduzir a variância e prever o valor contínuo final através da média aritmética das predições de cada árvore.")
-    pdf.add_bullet("Otimização por GridSearchCV: Ambos os paradigmas (classificação e regressão) utilizam busca em grade com validação cruzada K-Fold (5 folds) na partição de treino para selecionar os parâmetros ideais.")
-
-    # =====================================================================
-    # Slide 8 - 7. Métricas de Avaliação e o Paradoxo da Acurácia
-    # =====================================================================
-    pdf.add_section_slide("7", "Métricas de Avaliação e o Paradoxo da Acurácia")
+    pdf.add_section_slide("6", "Métricas de Avaliação e o Paradoxo da Acurácia")
     pdf.add_body_text("Métricas de Classificação (Turnover):")
     pdf.add_bullet("Acurácia é enganosa em bases assimétricas.")
     pdf.add_bullet("F1-Score é a métrica principal de seleção (harmonização de Precisão e Recall).")
     pdf.add_bullet("Recall (Sensibilidade) é priorizado para o RH interceptar desligamentos.")
     pdf.ln(2)
-    pdf.add_body_text("Métricas de Regressão (Bike Sharing):")
-    pdf.add_bullet("RMSE (Root Mean Squared Error): Penaliza desvios residuais grandes elevados ao quadrado.")
-    pdf.add_bullet("MAE (Mean Absolute Error): Desvio médio linear tangível das locações.")
-    pdf.add_bullet("R² Score (Coeficiente de Determinação): Percentual explicativo da variância.")
-
     # =====================================================================
-    # Slide 9 - 8. Resultados do Modelo de Turnover (Teste)
+    # Slide 7 - 7. Resultados do Modelo de Turnover (Teste)
     # =====================================================================
-    pdf.add_section_slide("8", "Resultados do Modelo de Turnover (Teste)")
+    pdf.add_section_slide("7", "Resultados do Modelo de Turnover (Teste)")
 
     current_y = pdf.get_y()
 
@@ -405,9 +360,9 @@ def build_presentation() -> None:
         pdf.image(img_path, x=142, y=current_y + 2, w=145)
 
     # =====================================================================
-    # Slide 10 - 9. Conclusão
+    # Slide 8 - 8. Conclusão
     # =====================================================================
-    pdf.add_section_slide("9", "Conclusão")
+    pdf.add_section_slide("8", "Conclusão")
     pdf.add_bullet("O pipeline de Machine Learning demonstrou eficácia na identificação de colaboradores com risco de desligamento usando o dataset HR Analytics (Kaggle).")
     pdf.add_bullet("O nível de satisfação e a média de horas mensais são os atributos mais preditivos de turnover.")
     pdf.add_bullet("Salário baixo e ausência de promoção nos últimos 5 anos amplificam significativamente o risco de saída.")
